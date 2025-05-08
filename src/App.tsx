@@ -1,23 +1,13 @@
 import { useThemeStore } from './store/themeStore';
-import {CountrySelector} from "./components/selectors/CountrySelector.tsx";
+import {FilterDevelopmentPage} from "./pages/FilterDevelopmentPage.tsx";
 
 function App() {
-    const { theme } = useThemeStore();
-
+    const { theme } = useThemeStore(); // Keep accessing theme state
     const themeClass = theme === 'dark' ? 'dark' : '';
 
     return (
-        <div className={`... ${themeClass} ...`}>
-            <header className="mb-10">
-                {/* ... title, theme toggle button ... */}
-            </header>
-
-            <div className="w-full md:w-1/3 p-4"> {/* Simulating a drawer section */}
-                <CountrySelector />
-            </div>
-
-            <main className="w-full max-w-2xl mt-5">
-            </main>
+        <div className={themeClass}> {/* Apply theme class for consistent styling */}
+            <FilterDevelopmentPage />
         </div>
     );
 }
