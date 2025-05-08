@@ -1,5 +1,5 @@
 import apiClient from './apiClient';
-import { CountryDto } from '../types/api.types'; // Adjust path if needed
+import type {CountryDto} from '../types/dto/country.dto';
 
 /**
  * Fetches a list of all available countries.
