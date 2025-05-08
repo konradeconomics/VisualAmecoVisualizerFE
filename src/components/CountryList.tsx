@@ -1,5 +1,5 @@
 import React from 'react';
-import { useFetchCountries } from '../../hooks/useFetchCountries';
+import { useFetchCountries } from '../hooks/useFetchCountries.ts';
 
 export const CountryList: React.FC = () => {
     const { data: countries, isLoading, isError, error } = useFetchCountries();
