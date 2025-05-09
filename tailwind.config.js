@@ -1,5 +1,5 @@
 /** @type {import('tailwindcss').Config} */
-export default {
+export default { // This indicates ES Module syntax
   darkMode: 'class',
   content: [
     "./index.html",
@@ -8,5 +8,7 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/forms'),
+  ],
 }

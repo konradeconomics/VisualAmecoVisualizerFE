@@ -1,95 +1,86 @@
 import { create } from 'zustand';
 
-interface MultiSelectionState {
-    // Core Data Dimensions for Graphing
-    selectedCountryCodes: string[];
-    selectedVariableCodes: string[];
-    selectedYears: number[];
+type SelectedVariable = { code: string; name: string };
 
-    // Navigational Selectors for Convenience
+interface MultiSelectionState {
+    selectedCountryCodes: string[];
+    selectedVariables: SelectedVariable[];
+    selectedYears: number[];
     selectedChapterIds: number[];
     selectedSubchapterIds: number[];
 
-    // Actions to manage selections
     toggleCountry: (code: string) => void;
-    toggleVariable: (code: string) => void;
+    toggleVariable: (variable: SelectedVariable) => void;
     toggleYear: (year: number) => void;
-
     toggleChapter: (id: number) => void;
     toggleSubchapter: (id: number) => void;
 
-    // Actions to clear selections for a specific category
     clearCountrySelections: () => void;
     clearVariableSelections: () => void;
     clearYearSelections: () => void;
     clearChapterSelections: () => void;
     clearSubchapterSelections: () => void;
-
     resetAllSelections: () => void;
 }
 
-const toggleArrayItem = <T>(array: T[], item: T): T[] =>
+const toggleVariableArrayItem = (
+    array: SelectedVariable[],
+    itemToAddOrRemove: SelectedVariable
+): SelectedVariable[] => {
+    const exists = array.some((item) => item.code === itemToAddOrRemove.code);
+    if (exists) {
+        return array.filter((item) => item.code !== itemToAddOrRemove.code);
+    } else {
+        return [...array, itemToAddOrRemove];
+    }
+};
+
+const togglePrimitiveArrayItem = <T>(array: T[], item: T): T[] =>
     array.includes(item) ? array.filter((i) => i !== item) : [...array, item];
 
 export const useSelectionStore = create<MultiSelectionState>((set) => ({
     selectedCountryCodes: [],
-    selectedVariableCodes: [],
+    selectedVariables: [], // **** CHANGED: Initialize as empty array for objects ****
     selectedYears: [],
     selectedChapterIds: [],
     selectedSubchapterIds: [],
 
-    // --- Actions for Core Data Dimensions ---
     toggleCountry: (code) =>
         set((state) => ({
-            selectedCountryCodes: toggleArrayItem(state.selectedCountryCodes, code),
+            selectedCountryCodes: togglePrimitiveArrayItem(state.selectedCountryCodes, code),
         })),
 
-    toggleVariable: (code) =>
+    toggleVariable: (variable) =>
         set((state) => ({
-            selectedVariableCodes: toggleArrayItem(state.selectedVariableCodes, code),
+            selectedVariables: toggleVariableArrayItem(state.selectedVariables, variable),
         })),
 
     toggleYear: (year) =>
         set((state) => ({
-            selectedYears: toggleArrayItem(state.selectedYears, year),
+            selectedYears: togglePrimitiveArrayItem(state.selectedYears, year),
         })),
 
-    // --- Actions for Navigational Selectors ---
     toggleChapter: (id) =>
-        set((state) => {
-            const newSelectedChapterIds = toggleArrayItem(state.selectedChapterIds, id);
-            return {
-                selectedChapterIds: newSelectedChapterIds,
-                selectedSubchapterIds: [], // Subchapters depend directly on chapters
-            };
-        }),
+        set((state) => ({
+            selectedChapterIds: togglePrimitiveArrayItem(state.selectedChapterIds, id),
+            selectedSubchapterIds: [],
+        })),
 
     toggleSubchapter: (id) =>
-        set((state) => {
-            return {
-                selectedSubchapterIds: toggleArrayItem(state.selectedSubchapterIds, id),
-            };
-        }),
+        set((state) => ({
+            selectedSubchapterIds: togglePrimitiveArrayItem(state.selectedSubchapterIds, id),
+        })),
 
     clearCountrySelections: () => set({ selectedCountryCodes: [] }),
-    clearVariableSelections: () => set({ selectedVariableCodes: [] }),
+    clearVariableSelections: () => set({ selectedVariables: [] }), // **** CHANGED ****
     clearYearSelections: () => set({ selectedYears: [] }),
-
     clearChapterSelections: () =>
-        set({
-            selectedChapterIds: [],
-            selectedSubchapterIds: [],
-        }),
-
-    clearSubchapterSelections: () =>
-        set({
-            selectedSubchapterIds: [],
-        }),
-
+        set({ selectedChapterIds: [], selectedSubchapterIds: [] }),
+    clearSubchapterSelections: () => set({ selectedSubchapterIds: [] }),
     resetAllSelections: () =>
         set({
             selectedCountryCodes: [],
-            selectedVariableCodes: [],
+            selectedVariables: [], // **** CHANGED ****
             selectedYears: [],
             selectedChapterIds: [],
             selectedSubchapterIds: [],
