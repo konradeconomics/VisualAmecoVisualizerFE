@@ -60,7 +60,12 @@ export const ChapterSelector: React.FC = () => {
                     className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-1 focus:ring-sky-500 focus:border-sky-500 dark:bg-slate-700 dark:border-slate-600 dark:text-white"
                 />
             </div>
-            <div className="flex-grow overflow-y-auto max-h-60 space-y-1 px-3 pb-3"> {/* LIST AREA with max-h-60 */}
+            <div className="flex-grow overflow-y-auto px-3 pb-3 space-y-1
+                max-h-[20rem]     // Base: 320px
+                md:max-h-[24rem]  // Medium: 384px
+                lg:max-h-[28rem]  // Large: 448px
+                xl:max-h-[32rem]  // Extra Large: 512px
+                ">
                 {renderContent()}
             </div>
             {selectedChapterIds.length > 0 && (
