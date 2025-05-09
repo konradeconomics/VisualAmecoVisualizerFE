@@ -7,8 +7,8 @@ import { YearSelector } from '../components/selectors/YearSelector';
 
 export const FilterDevelopmentPage: React.FC = () => {
     return (
-        // 1. Outermost container: Full viewport height, flex column, NO PAGE SCROLL (overflow-hidden)
-        <div className="h-screen flex flex-col p-4 md:p-6 bg-gray-100 dark:bg-slate-900 overflow-hidden">
+        // 1. Outermost container: min-h-screen allows it to grow. NO overflow-hidden.
+        <div className="min-h-screen flex flex-col p-4 md:p-6 bg-gray-100 dark:bg-slate-900">
 
             {/* 2. Header: Fixed height (content-based), does not shrink */}
             <header className="mb-4 pb-4 border-b dark:border-slate-700 shrink-0">
@@ -18,18 +18,16 @@ export const FilterDevelopmentPage: React.FC = () => {
                 </p>
             </header>
 
-            {/* 3. Main Filter Columns Area: Takes all remaining vertical space.
-                   overflow-hidden here is strict. If its children (the two columns) are too tall
-                   collectively for the space given by flex-grow, they will be clipped.
+            {/* (Optional) Current Selections Display: if you re-add it */}
+            {/* <div className="mb-4 shrink-0"><CurrentSelectionsDisplay /></div> */}
+
+            {/* 3. Main Filter Columns Area: Takes remaining vertical space.
+                   NO overflow-hidden here either. lg:items-start is good.
             */}
-            <div className="flex-grow flex flex-col lg:flex-row gap-4 md:gap-6 lg:items-start overflow-hidden">
+            <div className="flex-grow flex flex-col lg:flex-row gap-4 md:gap-6 lg:items-start">
 
                 {/* Column 1: Chapter -> Subchapter -> Variable */}
                 <div className="lg:w-3/5 flex flex-col md:flex-row gap-4 md:gap-6">
-                    {/* These flex-1 children in a md:flex-row will share width. Their height is content-based.
-                        The overall height of this column will be that of its TALLEST child when in md:flex-row.
-                        Each selector component MUST manage its own internal list scrolling within its given height.
-                    */}
                     <div className="flex-1 min-w-0 flex flex-col">
                         <h2 className="text-lg md:text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300 truncate shrink-0">Chapters</h2>
                         <ChapterSelector />
@@ -45,13 +43,12 @@ export const FilterDevelopmentPage: React.FC = () => {
                 </div>
 
                 {/* Column 2: Countries and Years */}
-                {/* This column stacks its children vertically. Its height will be sum of children heights. */}
                 <div className="lg:w-2/5 flex flex-col gap-4 md:gap-6">
-                    <div className="flex flex-col"> {/* Let selector dictate height */}
+                    <div className="flex flex-col">
                         <h2 className="text-lg md:text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300 shrink-0">Countries</h2>
                         <CountrySelector />
                     </div>
-                    <div className="flex flex-col"> {/* Let selector dictate height */}
+                    <div className="flex flex-col">
                         <h2 className="text-lg md:text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300 shrink-0">Years</h2>
                         <YearSelector />
                     </div>
