@@ -12,25 +12,30 @@ import {
 import { useFetchSelectedIndicators } from  '../../hooks/useFetchIndicator';
 import { useThemeStore } from '../../store/themeStore';
 
-// Define a type for the unique key of an indicator series
 type IndicatorSeriesKey = string; // e.g., "DEU-GDP_CPI_EUR"
 
-// Define the shape of data points for the Recharts LineChart
 interface ChartDataPoint {
     year: number;
     [seriesKey: string]: number | undefined; // e.g., DEU_GDP_CPI_EUR: 123.45
 }
 
-// Predefined distinct colors for lines
 const LINE_COLORS = [
     '#0ea5e9', // sky-500
-    '#ec4899', // pink-500
-    '#22c55e', // green-500
-    '#f97316', // orange-500
-    '#8b5cf6', // violet-500
-    '#eab308', // yellow-500
     '#ef4444', // red-500
+    '#22c55e', // green-500
+    '#eab308', // yellow-500
+    '#8b5cf6', // violet-500
+    '#ec4899', // pink-500
+    '#f97316', // orange-500
     '#14b8a6', // teal-500
+    '#3b82f6', // blue-500
+    '#a855f7', // purple-500
+    '#d946ef', // fuchsia-500
+    '#84cc16', // lime-500
+    '#64748b', // slate-500
+    '#78716c', // stone-500
+    '#06b6d4', // cyan-500
+    '#f59e0b', // amber-500
 ];
 
 export const IndicatorSimpleChart: React.FC = () => {
@@ -44,69 +49,53 @@ export const IndicatorSimpleChart: React.FC = () => {
 
     const { theme } = useThemeStore();
 
-    // State to hold the keys of indicators selected FOR PLOTTING
     const [
         plottedIndicatorKeys,
         setPlottedIndicatorKeys,
     ] = useState<Set<IndicatorSeriesKey>>(new Set());
-
-    // Effect to update plottedIndicatorKeys when fetchedIndicators change
-    // For now, let's default to plotting the first one if available, or all up to a limit
+    
     useEffect(() => {
         if (fetchedIndicators && fetchedIndicators.length > 0) {
-            // Check if any of the currently plotted keys are still valid within the new fetchedIndicators
             let currentPlottedAreStillValid = false;
             if (plottedIndicatorKeys.size > 0) {
                 for (const plottedKey of plottedIndicatorKeys) {
                     if (fetchedIndicators.some(ind => `${ind.countryCode}-${ind.variableCode}` === plottedKey)) {
                         currentPlottedAreStillValid = true;
-                        break; // At least one is still valid, no need to reset to default
+                        break;
                     }
                 }
             }
 
-            // If no currently plotted indicators are valid (e.g., they all disappeared from fetchedIndicators)
-            // OR if nothing was plotted yet, set a new default (the first available indicator).
+            
             if (!currentPlottedAreStillValid) {
                 const firstIndicatorKey = `${fetchedIndicators[0].countryCode}-${fetchedIndicators[0].variableCode}`;
-                // Only update if the state is actually different
                 if (!plottedIndicatorKeys.has(firstIndicatorKey) || plottedIndicatorKeys.size !== 1) {
                     console.log('useEffect: Setting default plotted indicator to:', firstIndicatorKey);
                     setPlottedIndicatorKeys(new Set([firstIndicatorKey]));
                 }
             }
-            // If current plotted keys are still valid, we don't touch them, respecting user's potential manual deselections.
-            // If the user manually deselected all, currentPlottedAreStillValid would be false, and it would re-select the first.
-            // This might still be too aggressive if the user wants to *deselect all*.
 
-        } else { // No fetched indicators
-            if (plottedIndicatorKeys.size > 0) { // Only update if needed
+        } else {
+            if (plottedIndicatorKeys.size > 0) {
                 console.log('useEffect: Clearing plotted indicators as fetchedIndicators is empty.');
                 setPlottedIndicatorKeys(new Set());
             }
         }
-        // Adding plottedIndicatorKeys to the dependency array is important because we read it.
-        // However, this makes it more prone to loops if setPlottedIndicatorKeys is called unconditionally.
-        // The conditional logic inside should prevent the loop.
     }, [fetchedIndicators, plottedIndicatorKeys]);
 
 
     const handlePlottedIndicatorToggle = (key: IndicatorSeriesKey) => {
-        console.log('Toggling plot for key:', key); // DEBUG
         setPlottedIndicatorKeys(prevKeys => {
             const newKeys = new Set(prevKeys);
             if (newKeys.has(key)) {
                 newKeys.delete(key);
-                console.log('Key removed, new keys:', newKeys); // DEBUG
             } else {
                 newKeys.add(key);
-                console.log('Key added, new keys:', newKeys); // DEBUG
             }
             return newKeys;
         });
     };
 
-    // Get the actual IndicatorDto objects selected for plotting
     const indicatorsToPlot = useMemo(() => {
         if (!fetchedIndicators) return [];
         return fetchedIndicators.filter(ind =>
@@ -115,13 +104,11 @@ export const IndicatorSimpleChart: React.FC = () => {
     }, [fetchedIndicators, plottedIndicatorKeys]);
 
 
-    // --- Data Transformation for Recharts ---
     const pivotedChartData = useMemo((): ChartDataPoint[] => {
         if (!indicatorsToPlot || indicatorsToPlot.length === 0) return [];
 
         const yearMap = new Map<number, ChartDataPoint>();
 
-        // Collect all years and initialize data points
         indicatorsToPlot.forEach(indicator => {
             indicator.values.forEach(val => {
                 if (!yearMap.has(val.year)) {
@@ -130,7 +117,6 @@ export const IndicatorSimpleChart: React.FC = () => {
             });
         });
 
-        // Populate amounts for each series
         indicatorsToPlot.forEach(indicator => {
             const seriesKey: IndicatorSeriesKey = `${indicator.countryCode}-${indicator.variableCode}`;
             indicator.values.forEach(val => {
@@ -141,17 +127,14 @@ export const IndicatorSimpleChart: React.FC = () => {
             });
         });
 
-        // Sort by year and convert map to array
         return Array.from(yearMap.values()).sort((a, b) => a.year - b.year);
     }, [indicatorsToPlot]);
 
 
-    // Tooltip styles (same as before)
     const tooltipContentStyle = useMemo(() => (theme === 'dark' ? { backgroundColor: 'rgba(50, 50, 50, 0.85)', border: '1px solid #4A5568', borderRadius: '0.375rem', color: '#e2e8f0' } : { backgroundColor: 'rgba(255, 255, 255, 0.9)', border: '1px solid #cbd5e0', borderRadius: '0.375rem', color: '#1a202c' }), [theme]);
     const tooltipTextStyle = useMemo(() => (theme === 'dark' ? { color: '#e2e8f0' } : { color: '#1a202c' }), [theme]);
 
 
-    // ----- Loading, Error, and No Data States -----
     if (isLoading && !isFetching && (!fetchedIndicators || fetchedIndicators.length === 0)) {
         return <div className="p-4 text-center text-gray-500 dark:text-gray-400">Loading chart data...</div>;
     }
@@ -210,8 +193,6 @@ export const IndicatorSimpleChart: React.FC = () => {
                                 tickFormatter={(value) => typeof value === 'number' ? value.toLocaleString() : value}
                                 tick={{ fontSize: 12, fill: theme === 'dark' ? '#94a3b8' : '#4b5563' }}
                                 stroke={theme === 'dark' ? '#64748b' : '#d1d5db'}
-                                // Y-axis label is tricky with multiple series of potentially different units.
-                                // For now, we omit a single unit label here. Units are in legend/tooltip.
                             />
                             <Tooltip contentStyle={tooltipContentStyle} labelStyle={tooltipTextStyle} itemStyle={tooltipTextStyle} cursor={{ stroke: theme === 'dark' ? '#4A5568' : '#cbd5e0', strokeWidth: 1 }}/>
                             <Legend verticalAlign="top" wrapperStyle={{ color: theme === 'dark' ? '#e2e8f0' : '#1a202c', maxHeight: '60px', overflowY: 'auto' }}/>
