@@ -7,6 +7,7 @@ import { YearSelector } from '../components/selectors/YearSelector';
 
 import { useSelectionStore } from '../store/selectionStore';
 import {IndicatorDataTable} from "../components/display/IndicatorDataTable.tsx";
+import {IndicatorSimpleChart} from "../components/charts/IndicatorSimpleChart.tsx";
 
 export const FilterDevelopmentPage: React.FC = () => {
     const resetAllSelections = useSelectionStore((state) => state.resetAllSelections);
@@ -57,11 +58,16 @@ export const FilterDevelopmentPage: React.FC = () => {
                         <h2 className="text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300">Indicator Data</h2>
                         <IndicatorDataTable />
                     </div>
+
+                    <div className="mt-1"> {/* Section for Chart */}
+                        <h2 className="text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300">Indicator Chart</h2>
+                        <IndicatorSimpleChart />
+                    </div>
                 </div>
             </div>
 
             <footer className="mt-auto pt-4 border-t dark:border-slate-700 flex justify-end space-x-2 shrink-0">
-                {/* Updated "Reset All" button */}
+                {/* "Reset All" button */}
                 <button
                     onClick={handleResetAll}
                     className="px-4 py-2 text-sm bg-gray-200 hover:bg-gray-300 dark:bg-slate-700 dark:hover:bg-slate-600 dark:text-gray-200 rounded"
@@ -69,7 +75,7 @@ export const FilterDevelopmentPage: React.FC = () => {
                     Reset All
                 </button>
                 <button className="px-4 py-2 text-sm bg-sky-600 hover:bg-sky-700 text-white rounded">
-                    Apply Filters {/* Still non-functional for now */}
+                    Apply Filters {/* non-functional for now */}
                 </button>
             </footer>
         </div>
