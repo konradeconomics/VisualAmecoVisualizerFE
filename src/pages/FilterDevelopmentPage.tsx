@@ -6,6 +6,7 @@ import { CountrySelector } from '../components/selectors/CountrySelector';
 import { YearSelector } from '../components/selectors/YearSelector';
 
 import { useSelectionStore } from '../store/selectionStore';
+import {IndicatorDataTable} from "../components/display/IndicatorDataTable.tsx";
 
 export const FilterDevelopmentPage: React.FC = () => {
     const resetAllSelections = useSelectionStore((state) => state.resetAllSelections);
@@ -50,6 +51,11 @@ export const FilterDevelopmentPage: React.FC = () => {
                     <div className="flex flex-col">
                         <h2 className="text-lg md:text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300 shrink-0">Years</h2>
                         <YearSelector />
+                    </div>
+                    {/* Display area for the Indicator Data Table */}
+                    <div className="mt-4"> {/* Add some margin if needed */}
+                        <h2 className="text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300">Indicator Data</h2>
+                        <IndicatorDataTable />
                     </div>
                 </div>
             </div>
