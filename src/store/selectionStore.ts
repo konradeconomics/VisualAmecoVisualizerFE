@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import type { CalculatedSeriesDto } from '../types/dto/calculatedSeries.dto';
 
 type SelectedVariable = { code: string; name: string };
 
@@ -8,6 +9,8 @@ interface MultiSelectionState {
     selectedYears: number[];
     selectedChapterIds: number[];
     selectedSubchapterIds: number[];
+
+    calculatedSeries: CalculatedSeriesDto[];
 
     toggleCountry: (code: string) => void;
     toggleVariable: (variable: SelectedVariable) => void;
@@ -21,6 +24,10 @@ interface MultiSelectionState {
     clearChapterSelections: () => void;
     clearSubchapterSelections: () => void;
     resetAllSelections: () => void;
+
+    addCalculatedSeries: (series: CalculatedSeriesDto) => void;
+    removeCalculatedSeries: (variableCode: string) => void; // Remove by its unique variableCode
+    clearAllCalculatedSeries: () => void;
 }
 
 const toggleVariableArrayItem = (
@@ -44,6 +51,8 @@ export const useSelectionStore = create<MultiSelectionState>((set) => ({
     selectedYears: [],
     selectedChapterIds: [],
     selectedSubchapterIds: [],
+
+    calculatedSeries: [],
 
     toggleCountry: (code) =>
         set((state) => ({
@@ -85,4 +94,21 @@ export const useSelectionStore = create<MultiSelectionState>((set) => ({
             selectedChapterIds: [],
             selectedSubchapterIds: [],
         }),
+
+    addCalculatedSeries: (series) =>
+        set((state) => ({
+            calculatedSeries: [
+                ...state.calculatedSeries.filter(cs => cs.variableCode !== series.variableCode),
+                series,
+            ],
+        })),
+
+    removeCalculatedSeries: (codeToRemove) =>
+        set((state) => ({
+            calculatedSeries: state.calculatedSeries.filter(
+                (series) => series.variableCode !== codeToRemove
+            ),
+        })),
+
+    clearAllCalculatedSeries: () => set({ calculatedSeries: [] }),
 }));
