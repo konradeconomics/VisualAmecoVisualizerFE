@@ -55,7 +55,7 @@ export const IndicatorDataTable: React.FC = () => {
             countryGroup.variables.push({
                 variableCode: indicator.variableCode,
                 variableName: indicator.variableName,
-                unit: indicator.unit,
+                unit: indicator.unitDescription,
                 yearData: yearDataForVariable,
             });
         });

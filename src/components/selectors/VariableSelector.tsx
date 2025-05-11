@@ -50,7 +50,7 @@ export const VariableSelector: React.FC = () => {
                 <div
                     key={variable.code}
                     onClick={() => handleVariableToggle({ code: variable.code, name: variable.name })}
-                    title={`${variable.name} (${variable.code}) - Unit: ${variable.unit}`}
+                    title={`${variable.name} (${variable.code}) - Unit: ${variable.unitDescription}`}
                     className={`p-2 rounded-md cursor-pointer border flex items-center group justify-between text-sm transition-all duration-150 ease-in-out ${
                         isSelected
                             ? 'bg-sky-500 text-white border-sky-600 shadow-sm dark:bg-sky-600 dark:border-sky-700'
