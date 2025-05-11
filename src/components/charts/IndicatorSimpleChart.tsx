@@ -11,7 +11,7 @@ import {
 } from 'recharts';
 import { useFetchSelectedIndicators } from '../../hooks/useFetchIndicator';
 import { useThemeStore } from '../../store/themeStore';
-import { getReadableUnit, getUnitCategory, type UnitCategory } from '../../utils/unitMapper'; // Adjust path as needed
+import { getReadableUnit, getUnitCategory, type UnitCategory } from '../../utils/unitMapper';
 
 type IndicatorSeriesKey = string;
 
@@ -24,6 +24,15 @@ const LINE_COLORS = [
     '#0ea5e9', '#ef4444', '#22c55e', '#eab308', '#8b5cf6', '#ec4899', '#f97316', '#14b8a6',
     '#3b82f6', '#a855f7', '#d946ef', '#84cc16', '#64748b', '#78716c', '#06b6d4', '#f59e0b',
 ];
+
+const AXIS_LINE_STYLES = [
+    undefined,       // Solid (for the first unique unit category / Y-axis)
+    '5 5',           // Dashed (for the second)
+    '1 5',           // Dotted (long dash, short gap - for the third)
+    '10 2 2 2',    // Dash-dot-dot (for the fourth)
+    '3 7',           // Another dash pattern
+];
+const DEFAULT_AXIS_LINE_STYLE = undefined; // Solid
 
 export const IndicatorSimpleChart: React.FC = () => {
     const {
@@ -72,70 +81,86 @@ export const IndicatorSimpleChart: React.FC = () => {
 
     const unitInfoForPlottedIndicators = useMemo(() => {
         if (!indicatorsToPlot || indicatorsToPlot.length === 0) return [];
-        return indicatorsToPlot.map(indicator => {
+        
+        const infoArray = indicatorsToPlot.map(indicator => {
             const readableUnit = getReadableUnit(indicator.unitCode, indicator.unitDescription);
+            const category = getUnitCategory(readableUnit);
+            
             return {
                 key: `${indicator.countryCode}-${indicator.variableCode}`,
                 readableUnit: readableUnit,
-                category: getUnitCategory(readableUnit),
+                category: category,
                 indicator: indicator,
             };
         });
+
+        console.log("--- Finished unitInfoForPlottedIndicators ---", infoArray); // Log the final array
+        return infoArray;
     }, [indicatorsToPlot]);
 
 
     const yAxisConfig = useMemo(() => {
         if (!unitInfoForPlottedIndicators || unitInfoForPlottedIndicators.length === 0) {
-            return [{ yAxisId: 'left' as const, orientation: 'left' as const, unitTypeLabel: 'Value' }];
+            return [{
+                yAxisId: 'left0',
+                orientation: 'left' as const,
+                unitTypeLabel: 'Value',
+                axisColor: theme === 'dark' ? '#94a3b8' : '#4b5563', // Neutral color
+                lineStrokeDasharray: DEFAULT_AXIS_LINE_STYLE
+            }];
         }
 
-        const uniqueCategories = Array.from(new Set(unitInfoForPlottedIndicators.map(info => info.category)));
-        const configs: { yAxisId: 'left' | 'right'; orientation: 'left' | 'right'; unitTypeLabel: string }[] = [];
-
-        const preferredLeftCategories: UnitCategory[] = ['Currency', 'Count', 'Index', 'PPS', 'Original', 'Other'];
-        const preferredRightCategories: UnitCategory[] = ['Percentage', 'Ratio'];
-
-        let hasLeftAxis = false;
-
-        for (const category of uniqueCategories) {
-            if (preferredLeftCategories.includes(category)) {
-                configs.push({yAxisId: 'left', orientation: 'left', unitTypeLabel: category});
-                hasLeftAxis = true;
-                break;
+        const orderedUniqueCategories: UnitCategory[] = [];
+        unitInfoForPlottedIndicators.forEach(info => {
+            if (!orderedUniqueCategories.includes(info.category)) {
+                orderedUniqueCategories.push(info.category);
             }
-        }
+        });
 
-        if (hasLeftAxis) {
-            for (const category of uniqueCategories) {
-                if (preferredRightCategories.includes(category) && !configs.some(c => c.unitTypeLabel === category && c.orientation === 'left')) {
-                    configs.push({yAxisId: 'right', orientation: 'right', unitTypeLabel: category});
-                    break;
-                }
-            }
-        }
+        const configs: Array<{
+            yAxisId: string;
+            orientation: 'left' | 'right';
+            unitTypeLabel: UnitCategory;
+            axisColor: string;
+            lineStrokeDasharray?: string;
+        }> = [];
 
-        if (!hasLeftAxis && uniqueCategories.length > 0) {
-            let assigned = false;
-            for (const category of preferredRightCategories) {
-                if (uniqueCategories.includes(category)) {
-                    configs.push({ yAxisId: 'left', orientation: 'left', unitTypeLabel: category });
-                    hasLeftAxis = true;
-                    assigned = true;
-                    break;
-                }
+        let leftAxesCount = 0;
+        let rightAxesCount = 0;
+        const maxAxesPerSide = 2;
+
+        orderedUniqueCategories.forEach((category, index) => {
+            if (configs.length >= (maxAxesPerSide * 2)) return;
+
+            let assignedOrientation: 'left' | 'right';
+            if (leftAxesCount <= rightAxesCount && leftAxesCount < maxAxesPerSide) {
+                assignedOrientation = 'left';
+                leftAxesCount++;
+            } else if (rightAxesCount < maxAxesPerSide) {
+                assignedOrientation = 'right';
+                rightAxesCount++;
+            } else {
+                assignedOrientation = 'left';
             }
-            if(!assigned && uniqueCategories[0]) {
-                configs.push({ yAxisId: 'left', orientation: 'left', unitTypeLabel: uniqueCategories[0] });
-                hasLeftAxis = true;
-            }
-        }
+
+            configs.push({
+                yAxisId: category,
+                orientation: assignedOrientation,
+                unitTypeLabel: category,
+                axisColor: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                lineStrokeDasharray: AXIS_LINE_STYLES[index % AXIS_LINE_STYLES.length]
+            });
+        });
 
         if (configs.length === 0) {
-            return [{ yAxisId: 'left' as const, orientation: 'left' as const, unitTypeLabel: 'Value' }];
+            return [{
+                yAxisId: 'left0', orientation: 'left' as const, unitTypeLabel: 'Value',
+                axisColor: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                lineStrokeDasharray: DEFAULT_AXIS_LINE_STYLE
+            }];
         }
-
         return configs;
-    }, [unitInfoForPlottedIndicators]);
+    }, [unitInfoForPlottedIndicators, theme]);
 
 
     const pivotedChartData = useMemo((): ChartDataPoint[] => {
@@ -201,30 +226,37 @@ export const IndicatorSimpleChart: React.FC = () => {
             <div className="flex-grow min-h-0">
                 {indicatorsToPlot.length > 0 && pivotedChartData.length > 0 && yAxisConfig && yAxisConfig.length > 0 ? (
                     <ResponsiveContainer width="100%" height="100%">
-                        <LineChart data={pivotedChartData} margin={{ top: 5, right: (yAxisConfig.some(ax=>ax.orientation === 'right') ? 40 : 20), left: (yAxisConfig.some(ax=>ax.orientation === 'left') ? 30 : 5), bottom: 25 }}>
+                        <LineChart data={pivotedChartData} margin={{ top: 5, right: yAxisConfig.some(ax=>ax.orientation === 'right') ? 60 : 20, left: yAxisConfig.some(ax=>ax.orientation === 'left') ? 60 : 5, bottom: 25 }}>
                             <CartesianGrid strokeDasharray="3 3" stroke={theme === 'dark' ? "#4A5568" : "#e2e8f0"} />
-                            <XAxis
-                                dataKey="year" dy={10}
-                                tick={{ fontSize: 10, fill: theme === 'dark' ? '#94a3b8' : '#4b5563' }}
-                                stroke={theme === 'dark' ? '#64748b' : '#d1d5db'}
-                                label={{ value: "Year", position: "insideBottom", offset: -15, fontSize: 12, fill: theme === 'dark' ? '#94a3b8' : '#374151' }}
-                            />
+                            <XAxis dataKey="year" dy={10} /* ... */ />
 
-                            {/* Dynamically render Y-Axes */}
+                            {/* Y-Axes with neutral, theme-based color */}
                             {yAxisConfig.map(axis => (
                                 <YAxis
                                     key={axis.yAxisId}
                                     yAxisId={axis.yAxisId}
                                     orientation={axis.orientation}
-                                    tickFormatter={(value) => typeof value === 'number' ? value.toLocaleString(undefined, {maximumFractionDigits: 2}) : value}
-                                    tick={{ fontSize: 10, fill: theme === 'dark' ? '#94a3b8' : '#4b5563' }}
-                                    stroke={theme === 'dark' ? '#64748b' : '#d1d5db'}
+                                    stroke={axis.axisColor}
+                                    strokeDasharray={axis.lineStrokeDasharray}
+                                    tickFormatter={(value) =>
+                                        typeof value === 'number'
+                                            ? value.toLocaleString(undefined, {maximumFractionDigits:1})
+                                            : value
+                                    }
+                                    tick={{
+                                        fontSize: 10,
+                                        fill: axis.axisColor
+                                    }}
                                     label={{
                                         value: axis.unitTypeLabel,
-                                        angle: -90,
-                                        position: axis.orientation === 'left' ? 'insideLeft' : 'insideRight',
-                                        style: { textAnchor: 'middle', fontSize: 12, fill: theme === 'dark' ? '#94a3b8' : '#374151' },
-                                        dx: axis.orientation === 'left' ? -20 : (axis.orientation === 'right' ? 20 : 0), // Adjusted dx
+                                        angle: 0,
+                                        position: 'top',
+                                        offset: 10,
+                                        style: {
+                                            textAnchor: 'middle',
+                                            fontSize: 12,
+                                            fill: axis.axisColor
+                                        },
                                     }}
                                     width={55}
                                 />
@@ -233,24 +265,14 @@ export const IndicatorSimpleChart: React.FC = () => {
                             <Tooltip contentStyle={tooltipContentStyle} labelStyle={tooltipTextStyle} itemStyle={tooltipTextStyle} cursor={{ stroke: theme === 'dark' ? '#4A5568' : '#cbd5e0', strokeWidth: 1 }}/>
                             <Legend verticalAlign="top" wrapperStyle={{ color: theme === 'dark' ? '#e2e8f0' : '#1a202c', maxHeight: '60px', overflowY: 'auto' }}/>
 
-                            {/* Use unitInfoForPlottedIndicators for line rendering */}
+                            {/* Lines with unique colors + group-based dash style FROM HIERARCHY */}
                             {unitInfoForPlottedIndicators.map((info, index) => {
                                 const seriesKey: IndicatorSeriesKey = info.key;
 
-                                let lineYAxisId = "left";
-                                if (yAxisConfig.length > 0) {
-                                    const matchingAxis = yAxisConfig.find(ax => ax.unitTypeLabel === info.category);
-                                    if (matchingAxis) {
-                                        lineYAxisId = matchingAxis.yAxisId;
-                                    } else if (yAxisConfig.length === 1) {
-                                        lineYAxisId = yAxisConfig[0].yAxisId;
-                                    } else if (yAxisConfig.length > 1 && yAxisConfig.find(ax => ax.yAxisId === "left")) {
-                                        lineYAxisId = "left";
-                                    } else if (yAxisConfig.length > 0) {
-                                        lineYAxisId = yAxisConfig[0].yAxisId;
-                                    }
-                                }
+                                const axisConfigForThisLine = yAxisConfig.find(ax => ax.unitTypeLabel === info.category);
+                                const lineYAxisId = axisConfigForThisLine ? axisConfigForThisLine.yAxisId : (yAxisConfig[0]?.yAxisId || 'left0');
 
+                                const lineStyleDashArray = axisConfigForThisLine?.lineStrokeDasharray;
 
                                 return (
                                     <Line
@@ -259,6 +281,7 @@ export const IndicatorSimpleChart: React.FC = () => {
                                         type="monotone"
                                         dataKey={seriesKey}
                                         stroke={LINE_COLORS[index % LINE_COLORS.length]}
+                                        strokeDasharray={lineStyleDashArray}
                                         strokeWidth={2}
                                         activeDot={{ r: 6, strokeWidth: 0, fill: LINE_COLORS[index % LINE_COLORS.length] }}
                                         dot={{ r: 3, strokeWidth: 0, fill: LINE_COLORS[index % LINE_COLORS.length] }}

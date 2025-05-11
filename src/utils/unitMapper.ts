@@ -16,14 +16,15 @@ export const getReadableUnit = (
 };
 
 export type UnitCategory =
-    | 'Currency'
-    | 'Percentage'
-    | 'Index'
-    | 'Count'
-    | 'PPS'       // Purchasing Power Standards
-    | 'Ratio'
-    | 'Original'
-    | 'Other';
+    | 'Currency'     // For monetary values (ECU, EUR, national currency)
+    | 'PPS'          // Purchasing Power Standards
+    | 'Percentage'   // For % of X, or explicit percentages, rates
+    | 'Share'        // For explicit shares
+    | 'Index'        // For "2015=100" type indices
+    | 'Count'        // For persons, FTEs, etc.
+    | 'Ratio'        // For other ratios not explicitly percentages (e.g., capital output ratio)
+    | 'Productivity' // For productivity/efficiency measures if they don't fit elsewhere cleanly
+    | 'Other';       // Fallback
 
 /**
  * Attempts to categorize a given readable unit string.
@@ -34,31 +35,51 @@ export const getUnitCategory = (readableUnit: string): UnitCategory => {
     if (!readableUnit) return 'Other';
     const unitLower = readableUnit.toLowerCase();
 
-    if (unitLower.startsWith("% of") || unitLower.includes("percentage of") || unitLower.endsWith('%')) {
-        return 'Percentage';
-    }
-    if (unitLower.includes("pps")) { // Purchasing Power Standards
-        return 'PPS';
-    }
-    if (unitLower.includes("ecu/eur") || unitLower.includes("eur") || unitLower.includes("national currency") || unitLower.includes("mrd") || unitLower.includes("bn") || unitLower.includes("million") || unitLower.includes("billion")) {
-        return 'Currency';
-    }
-    if (unitLower.includes("index") || unitLower.match(/\b\d{4}=100\b/) || unitLower.includes("base year")) {
+    // Most specific checks first
+    if (unitLower.includes("(2015 = 100)") || unitLower.includes("2015=100")) { // Covers various index formats
         return 'Index';
     }
+    if (unitLower.includes("percentage of") || unitLower.includes("(percentage") || unitLower.endsWith('%')) {
+        return 'Percentage';
+    }
+    if (unitLower.includes("share")) { // Specific keyword for Share
+        return 'Share';
+    }
+    if (unitLower.includes("rate") && !unitLower.includes("exchange rates")) { // "Rate" often implies percentage or ratio, unless it's an exchange rate (currency)
+        return 'Percentage'; // Or 'Ratio' depending on context, for now grouping with Percentage
+    }
+    if (unitLower.includes("mrd ecu/eur") || unitLower.includes("1000 ecu/eur") || unitLower.includes("mrd eur")) {
+        return 'Currency'; // Could also be 'EUR' as a sub-category if needed
+    }
+    if (unitLower.includes("national currency") && !unitLower.includes("2015 = 100")) { // Avoid capturing "National currency: 2015 = 100" as currency here
+        return 'Currency';
+    }
+    if (unitLower.includes("pps")) {
+        return 'PPS';
+    }
+    if (unitLower.includes("1000 persons") || unitLower.includes("1000 fte's")) {
+        return 'Count';
+    }
+    if (unitLower.includes("capital output ratio")) {
+        return 'Ratio';
+    }
+    if (unitLower.includes("capital productivity") || unitLower.includes("total factor productivity") || unitLower.includes("marginal efficiency")) {
+        // These might be indices or ratios. Let's tentatively group them.
+        // Or they could be specific enough to warrant their own category if they need a unique axis.
+        return 'Productivity'; // Or 'Index' or 'Ratio' depending on how you want to group
+    }
+
+    // Broader fallback checks
     if (unitLower.includes("persons") || unitLower.includes("capita") || unitLower.includes("population") || unitLower.includes("employment") || unitLower.includes("employee")) {
         return 'Count';
     }
-    if ((unitLower.includes("thousand") || unitLower.includes("ths")) && !unitLower.includes("currency") && !unitLower.includes("eur")) {
-        return 'Count';
+    if (unitLower.includes("eur") || unitLower.includes("ecu")) { // General EUR/ECU if not caught by Mrd/1000
+        return 'Currency';
     }
-    if (unitLower.includes("ratio") || (unitLower.includes("/") && !unitLower.includes("ecu/eur"))) {
+    if (unitLower.includes("ratio")) { // General ratio
         return 'Ratio';
     }
 
-    if (unitLower.includes("original units")) {
-        return 'Other';
-    }
-
-    return 'Other'; // Default fallback category
-};
+    console.warn(`Unit "${readableUnit}" categorized as 'Other'. Review unitMapper.ts for more specific categorization.`);
+    return 'Other';
+}
