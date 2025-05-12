@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useThemeStore } from './store/themeStore';
 import { IndicatorDataTable } from './components/display/IndicatorDataTable';
-import { IndicatorSimpleChart } from './components/charts/IndicatorSimpleChart';
+import { IndicatorChart } from './components/charts/IndicatorChart.tsx';
 import { FilterDrawer } from './components/layout/FilterDrawer';
 import {GraphLogicControls} from "./components/controls/GraphLogicControls.tsx";
 
@@ -65,7 +65,7 @@ export const App: React.FC = () => {
                         </div>
                         <div>
                             <h2 className="text-xl font-semibold mb-3 text-gray-700 dark:text-gray-300">Indicator Chart</h2>
-                            <IndicatorSimpleChart />
+                            <IndicatorChart />
                         </div>
                         <div className="mt-8 p-4 border border-dashed rounded-lg dark:border-slate-700 min-h-[100px] flex items-center justify-center">
                             <GraphLogicControls/> 

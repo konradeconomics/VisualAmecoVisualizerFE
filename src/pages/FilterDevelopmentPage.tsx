@@ -7,7 +7,7 @@ import { YearSelector } from '../components/selectors/YearSelector';
 
 import { useSelectionStore } from '../store/selectionStore';
 import {IndicatorDataTable} from "../components/display/IndicatorDataTable.tsx";
-import {IndicatorSimpleChart} from "../components/charts/IndicatorSimpleChart.tsx";
+import {IndicatorChart} from "../components/charts/IndicatorChart.tsx";
 
 export const FilterDevelopmentPage: React.FC = () => {
     const resetAllSelections = useSelectionStore((state) => state.resetAllSelections);
@@ -61,7 +61,7 @@ export const FilterDevelopmentPage: React.FC = () => {
 
                     <div className="mt-1"> {/* Section for Chart */}
                         <h2 className="text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300">Indicator Chart</h2>
-                        <IndicatorSimpleChart />
+                        <IndicatorChart />
                     </div>
                 </div>
             </div>
