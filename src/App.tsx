@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { useThemeStore } from './store/themeStore';
 import { IndicatorDataTable } from './components/display/IndicatorDataTable';
 import { IndicatorSimpleChart } from './components/charts/IndicatorSimpleChart';
-import { FilterDrawer } from './components/layout/FilterDrawer'; // Import the new FilterDrawer
+import { FilterDrawer } from './components/layout/FilterDrawer';
+import {GraphLogicControls} from "./components/controls/GraphLogicControls.tsx";
 
 // import { SlidersHorizontal } from 'lucide-react'; // Optional icon
 
@@ -67,7 +68,7 @@ export const App: React.FC = () => {
                             <IndicatorSimpleChart />
                         </div>
                         <div className="mt-8 p-4 border border-dashed rounded-lg dark:border-slate-700 min-h-[100px] flex items-center justify-center">
-                            <p className="text-gray-400 dark:text-slate-500">[Graph Logic Controls Placeholder - Future]</p>
+                            <GraphLogicControls/> 
                         </div>
                     </div>
                 </main>

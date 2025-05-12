@@ -1,7 +1,20 @@
 import { create } from 'zustand';
 import type { CalculatedSeriesDto } from '../types/dto/calculatedSeries.dto';
+//import type { IndicatorDto} from "../types/dto/indicator.dto.ts";
 
 type SelectedVariable = { code: string; name: string };
+type IndicatorSeriesKey = string;
+
+interface ChartInteractionState {
+    plottedIndicatorKeys: Set<IndicatorSeriesKey>;
+    calculatedSeries: CalculatedSeriesDto[];
+
+    togglePlottedIndicator: (key: IndicatorSeriesKey) => void;
+    setPlottedIndicators: (keys: Set<IndicatorSeriesKey>) => void; // For setting defaults or clearing
+    addCalculatedSeries: (series: CalculatedSeriesDto) => void;
+    removeCalculatedSeries: (variableCode: string) => void;
+    clearAllCalculatedSeries: () => void;
+}
 
 interface MultiSelectionState {
     selectedCountryCodes: string[];
@@ -9,9 +22,10 @@ interface MultiSelectionState {
     selectedYears: number[];
     selectedChapterIds: number[];
     selectedSubchapterIds: number[];
-
+    
+    plottedIndicatorKeys: Set<IndicatorSeriesKey>;
     calculatedSeries: CalculatedSeriesDto[];
-
+    
     toggleCountry: (code: string) => void;
     toggleVariable: (variable: SelectedVariable) => void;
     toggleYear: (year: number) => void;
@@ -45,13 +59,14 @@ const toggleVariableArrayItem = (
 const togglePrimitiveArrayItem = <T>(array: T[], item: T): T[] =>
     array.includes(item) ? array.filter((i) => i !== item) : [...array, item];
 
-export const useSelectionStore = create<MultiSelectionState>((set) => ({
+export const useSelectionStore = create<MultiSelectionState & ChartInteractionState>((set) => ({
     selectedCountryCodes: [],
     selectedVariables: [], // **** CHANGED: Initialize as empty array for objects ****
     selectedYears: [],
     selectedChapterIds: [],
     selectedSubchapterIds: [],
 
+    plottedIndicatorKeys: new Set(),
     calculatedSeries: [],
 
     toggleCountry: (code) =>
@@ -81,7 +96,7 @@ export const useSelectionStore = create<MultiSelectionState>((set) => ({
         })),
 
     clearCountrySelections: () => set({ selectedCountryCodes: [] }),
-    clearVariableSelections: () => set({ selectedVariables: [] }), // **** CHANGED ****
+    clearVariableSelections: () => set({ selectedVariables: [] }),
     clearYearSelections: () => set({ selectedYears: [] }),
     clearChapterSelections: () =>
         set({ selectedChapterIds: [], selectedSubchapterIds: [] }),
@@ -89,11 +104,26 @@ export const useSelectionStore = create<MultiSelectionState>((set) => ({
     resetAllSelections: () =>
         set({
             selectedCountryCodes: [],
-            selectedVariables: [], // **** CHANGED ****
+            selectedVariables: [],
             selectedYears: [],
             selectedChapterIds: [],
             selectedSubchapterIds: [],
+            plottedIndicatorKeys: new Set(),
+            calculatedSeries: [],
         }),
+
+    togglePlottedIndicator: (key: string) =>
+        set((state) => {
+            const newKeys = new Set(state.plottedIndicatorKeys);
+            if (newKeys.has(key)) {
+                newKeys.delete(key);
+            } else {
+                newKeys.add(key);
+            }
+            return { plottedIndicatorKeys: newKeys };
+        }),
+
+    setPlottedIndicators: (keys: Iterable<string> | null | undefined) => set({ plottedIndicatorKeys: new Set(keys) }),
 
     addCalculatedSeries: (series) =>
         set((state) => ({
@@ -110,5 +140,12 @@ export const useSelectionStore = create<MultiSelectionState>((set) => ({
             ),
         })),
 
-    clearAllCalculatedSeries: () => set({ calculatedSeries: [] }),
+    clearAllCalculatedSeries: () => set(state => {
+        const newPlottedKeys = new Set(state.plottedIndicatorKeys);
+        state.calculatedSeries.forEach(cs => newPlottedKeys.delete(cs.variableCode));
+        return {
+            calculatedSeries: [],
+            plottedIndicatorKeys: newPlottedKeys
+        };
+    }),
 }));
