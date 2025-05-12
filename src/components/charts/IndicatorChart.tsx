@@ -4,7 +4,7 @@ import { useSelectionStore } from '../../store/selectionStore';
 import { getReadableUnit, getUnitCategory } from '../../utils/unitMapper';
 import type { PlottableChartSeries } from '../../types/PlottableChartSeries';
 import { ChartSeriesSelector } from './ChartSeriesSelector';
-import { useChartDataPreparation } from '../../hooks/useChartDataPreparation'; // Import custom hook
+import { useChartDataPreparation } from '../../hooks/useChartDataPreparation'; 
 import { RechartsPlot } from './RechartsPlot';
 import { ChartDotToggle } from '../controls/ChartDotToggle';
 
@@ -65,7 +65,7 @@ export const IndicatorChart: React.FC = () => {
     }
 
     return (
-        <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-lg shadow bg-white dark:bg-slate-800 h-[500px] md:h-[600px] w-full flex flex-col">
+        <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-lg shadow bg-white dark:bg-slate-800 h-[600px] md:h-[750px] lg:h-[85vh] w-full flex flex-col">
             {allAvailableSeriesForSelection.length > 0 && (
                 <ChartSeriesSelector
                     allAvailableSeries={allAvailableSeriesForSelection}
