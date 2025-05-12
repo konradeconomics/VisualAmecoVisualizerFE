@@ -147,6 +147,7 @@ export const GraphLogicControls: React.FC = () => {
             <h3 className="text-md font-semibold text-gray-700 dark:text-gray-300 mb-3">
                 Create Calculated Series
             </h3>
+            
             {!canEnableControls && (
                 <p className="text-sm text-gray-500 dark:text-gray-400">
                     Plot at least two distinct series on the chart to enable calculations.

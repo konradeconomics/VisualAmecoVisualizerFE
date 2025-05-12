@@ -8,6 +8,8 @@ type IndicatorSeriesKey = string;
 interface ChartInteractionState {
     plottedIndicatorKeys: Set<IndicatorSeriesKey>;
     calculatedSeries: CalculatedSeriesDto[];
+    
+    showDotsOnLines: boolean;
 
     togglePlottedIndicator: (key: IndicatorSeriesKey) => void;
     setPlottedIndicators: (keys: Set<IndicatorSeriesKey>) => void; // For setting defaults or clearing
@@ -42,6 +44,8 @@ interface MultiSelectionState {
     addCalculatedSeries: (series: CalculatedSeriesDto) => void;
     removeCalculatedSeries: (variableCode: string) => void; // Remove by its unique variableCode
     clearAllCalculatedSeries: () => void;
+    
+    toggleShowDotsOnLines: () => void;
 }
 
 const toggleVariableArrayItem = (
@@ -61,10 +65,12 @@ const togglePrimitiveArrayItem = <T>(array: T[], item: T): T[] =>
 
 export const useSelectionStore = create<MultiSelectionState & ChartInteractionState>((set) => ({
     selectedCountryCodes: [],
-    selectedVariables: [], // **** CHANGED: Initialize as empty array for objects ****
+    selectedVariables: [],
     selectedYears: [],
     selectedChapterIds: [],
     selectedSubchapterIds: [],
+
+    showDotsOnLines: true,
 
     plottedIndicatorKeys: new Set(),
     calculatedSeries: [],
@@ -148,4 +154,9 @@ export const useSelectionStore = create<MultiSelectionState & ChartInteractionSt
             plottedIndicatorKeys: newPlottedKeys
         };
     }),
+
+    toggleShowDotsOnLines: () =>
+        set((state) => ({
+            showDotsOnLines: !state.showDotsOnLines,
+        })),
 }));

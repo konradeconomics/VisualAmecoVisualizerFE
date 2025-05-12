@@ -14,6 +14,7 @@ import { useThemeStore } from '../../store/themeStore';
 import { getReadableUnit, getUnitCategory, type UnitCategory } from '../../utils/unitMapper';
 import {useSelectionStore} from "../../store/selectionStore.ts";
 import type {YearValueDto} from "../../types/dto/yearValue.dto.ts";
+import { ChartDotToggle} from "../controls/ChartDotToggle.tsx";
 
 type IndicatorSeriesKey = string; // Typically a unique string identifier for a series
 
@@ -70,7 +71,8 @@ export const IndicatorSimpleChart: React.FC = () => {
     const togglePlottedIndicator = useSelectionStore((state) => state.togglePlottedIndicator);
     const setPlottedIndicators = useSelectionStore((state) => state.setPlottedIndicators);
     const allCalculatedSeries = useSelectionStore((state) => state.calculatedSeries);
-
+    const showDotsOnLines = useSelectionStore((state) => state.showDotsOnLines);
+    
     // Combine fetched and calculated series into a single list with a unified structure
     const allAvailableSeriesForSelection = useMemo((): PlottableChartSeries[] => {
         const fetchedAsPlottable: PlottableChartSeries[] = (fetchedIndicatorsData || []).map(ind => {
@@ -227,6 +229,10 @@ export const IndicatorSimpleChart: React.FC = () => {
                     </div>
                 </div>
             )}
+            
+            <div className="mb-2 shrink-0 flex justify-start">
+                <ChartDotToggle />
+            </div>
 
             {isFetching && (<div className="p-1 text-xs text-center text-sky-600 dark:text-sky-400 shrink-0">Updating chart...</div>)}
 
@@ -264,10 +270,10 @@ export const IndicatorSimpleChart: React.FC = () => {
                                         key={seriesKey} yAxisId={lineYAxisId} type="monotone" dataKey={seriesKey}
                                         stroke={LINE_COLORS[index % LINE_COLORS.length]}
                                         strokeDasharray={lineStyleDashArray}
-                                        strokeWidth={info.indicator.isCalculated ? 2.5 : 2} // Example: calculated lines thicker
+                                        strokeWidth={info.indicator.isCalculated ? 2.5 : 2}
                                         activeDot={{ r: 6, strokeWidth: 0, fill: LINE_COLORS[index % LINE_COLORS.length] }}
-                                        dot={{ r: 3, strokeWidth: 0, fill: LINE_COLORS[index % LINE_COLORS.length] }}
-                                        name={info.indicator.uiDisplayName} // Use the pre-formatted name for legend
+                                        dot= {showDotsOnLines ? { r: 3, strokeWidth: 0, fill: LINE_COLORS[index % LINE_COLORS.length] } : false}
+                                        name={info.indicator.uiDisplayName}
                                         connectNulls={true}
                                     />
                                 );
