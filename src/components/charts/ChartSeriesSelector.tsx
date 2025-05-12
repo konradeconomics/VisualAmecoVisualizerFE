@@ -1,6 +1,7 @@
 import React from 'react';
 import { useSelectionStore } from '../../store/selectionStore';
 import type { PlottableChartSeries } from '../../types/PlottableChartSeries.ts'
+import {EditableSeriesName} from "./EditableSeriesName.tsx";
 
 interface ChartSeriesSelectorProps {
     allAvailableSeries: PlottableChartSeries[];
@@ -30,9 +31,7 @@ export const ChartSeriesSelector: React.FC<ChartSeriesSelectorProps> = ({
                                 onChange={() => togglePlottedIndicator(series.displayKey)}
                                 className="form-checkbox h-4 w-4 text-sky-600 dark:text-sky-500 rounded border-gray-300 dark:border-slate-600 focus:ring-sky-500"
                             />
-                            <span className={`dark:text-slate-200 ${series.isCalculated ? 'italic font-semibold' : ''}`}>
-                {series.uiDisplayName}
-              </span>
+                            <EditableSeriesName series={series} />
                         </label>
                     );
                 })}

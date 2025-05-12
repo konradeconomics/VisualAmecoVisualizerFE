@@ -11,11 +11,16 @@ interface ChartInteractionState {
     
     showDotsOnLines: boolean;
 
+    customSeriesNames: Record<string, string>;
+
     togglePlottedIndicator: (key: IndicatorSeriesKey) => void;
     setPlottedIndicators: (keys: Set<IndicatorSeriesKey>) => void; // For setting defaults or clearing
     addCalculatedSeries: (series: CalculatedSeriesDto) => void;
     removeCalculatedSeries: (variableCode: string) => void;
     clearAllCalculatedSeries: () => void;
+
+    setCustomSeriesName: (seriesKey: IndicatorSeriesKey, customName: string) => void;
+    clearCustomSeriesName: (seriesKey: IndicatorSeriesKey) => void;
 }
 
 interface MultiSelectionState {
@@ -71,6 +76,7 @@ export const useSelectionStore = create<MultiSelectionState & ChartInteractionSt
     selectedSubchapterIds: [],
 
     showDotsOnLines: true,
+    customSeriesNames: {},
 
     plottedIndicatorKeys: new Set(),
     calculatedSeries: [],
@@ -116,6 +122,7 @@ export const useSelectionStore = create<MultiSelectionState & ChartInteractionSt
             selectedSubchapterIds: [],
             plottedIndicatorKeys: new Set(),
             calculatedSeries: [],
+            customSeriesNames: {},
         }),
 
     togglePlottedIndicator: (key: string) =>
@@ -159,4 +166,19 @@ export const useSelectionStore = create<MultiSelectionState & ChartInteractionSt
         set((state) => ({
             showDotsOnLines: !state.showDotsOnLines,
         })),
+
+    setCustomSeriesName: (seriesKey, customName) =>
+        set((state) => ({
+            customSeriesNames: {
+                ...state.customSeriesNames,
+                [seriesKey]: customName,
+            },
+        })),
+
+    clearCustomSeriesName: (seriesKey) =>
+        set((state) => {
+            const newCustomNames = { ...state.customSeriesNames };
+            delete newCustomNames[seriesKey];
+            return { customSeriesNames: newCustomNames };
+        }),
 }));
