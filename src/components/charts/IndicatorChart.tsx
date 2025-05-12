@@ -12,17 +12,23 @@ export const IndicatorChart: React.FC = () => {
     const { allData: fetchedIndicatorsData, isLoading, isFetching, isError, errors } = useFetchSelectedIndicators();
     const plottedIndicatorKeys = useSelectionStore((state) => state.plottedIndicatorKeys);
     const allCalculatedSeries = useSelectionStore((state) => state.calculatedSeries);
+    const customSeriesNames = useSelectionStore((state) => state.customSeriesNames);
 
     const allAvailableSeriesForSelection = useMemo((): PlottableChartSeries[] => {
         const fetchedAsPlottable: PlottableChartSeries[] = (fetchedIndicatorsData || []).map(ind => {
+            const displayKey = `${ind.countryCode}-${ind.variableCode}`;
             const readableUnit = getReadableUnit(ind.unitCode, ind.unitDescription);
+
+            const baseDisplayName = `${ind.countryName} - ${ind.variableName} (${readableUnit})`;
+            const finalDisplayName = customSeriesNames[displayKey] || baseDisplayName; // Use custom name if it exists
+
             return {
                 ...ind,
-                displayKey: `${ind.countryCode}-${ind.variableCode}`,
+                displayKey: displayKey,
                 isCalculated: false,
                 readableUnit: readableUnit,
                 category: getUnitCategory(readableUnit),
-                uiDisplayName: `${ind.countryName} - ${ind.variableName} (${readableUnit})`,
+                uiDisplayName: finalDisplayName,
             };
         });
         const calculatedAsPlottable: PlottableChartSeries[] = (allCalculatedSeries || []).map(calc => {
@@ -45,7 +51,6 @@ export const IndicatorChart: React.FC = () => {
         );
     }, [allAvailableSeriesForSelection, plottedIndicatorKeys]);
 
-    // Use the custom hook for complex data prep
     const {
         unitInfoForPlotting,
         yAxisConfig,
