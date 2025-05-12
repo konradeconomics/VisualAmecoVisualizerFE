@@ -8,7 +8,7 @@ import { useChartDataPreparation } from '../../hooks/useChartDataPreparation'; /
 import { RechartsPlot } from './RechartsPlot';
 import { ChartDotToggle } from '../controls/ChartDotToggle';
 
-export const IndicatorSimpleChart: React.FC = () => {
+export const IndicatorChart: React.FC = () => {
     const { allData: fetchedIndicatorsData, isLoading, isFetching, isError, errors } = useFetchSelectedIndicators();
     const plottedIndicatorKeys = useSelectionStore((state) => state.plottedIndicatorKeys);
     const allCalculatedSeries = useSelectionStore((state) => state.calculatedSeries);
