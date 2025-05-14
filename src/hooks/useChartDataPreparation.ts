@@ -17,7 +17,7 @@ interface ChartDataPreparationResult {
 export const useChartDataPreparation = (
     indicatorsToPlot: PlottableChartSeries[]
 ): ChartDataPreparationResult => {
-    const { theme } = useThemeStore(); // Assuming theme affects axis colors
+    const { theme } = useThemeStore();
 
     const unitInfoForPlotting = useMemo((): LineRenderInfo[] => {
         if (!indicatorsToPlot || indicatorsToPlot.length === 0) return [];
@@ -48,7 +48,7 @@ export const useChartDataPreparation = (
         const configs: YAxisConfigEntry[] = [];
         let leftAxesCount = 0;
         let rightAxesCount = 0;
-        const maxAxesPerSide = 1; // Or 2 if you want to support up to 4 axes
+        const maxAxesPerSide = 2;
 
         orderedUniqueCategories.forEach((category, index) => {
             if (configs.length >= (maxAxesPerSide * 2)) return;
