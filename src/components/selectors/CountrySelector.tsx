@@ -1,12 +1,12 @@
 import React, {useMemo, useState} from 'react';
 import { useFetchCountries } from '../../hooks/useFetchCountries';
-import { useSelectionStore } from '../../store/selectionStore';
+import { useFilterSelectionsStore} from "../../store/filterSelectionStore.ts";
 import type { CountryDto } from '../../types/dto/country.dto';
 
 export const CountrySelector: React.FC = () => {
     const { data: countries, isLoading, isError, error } = useFetchCountries();
-    const selectedCountryCodes = useSelectionStore((state) => state.selectedCountryCodes);
-    const toggleCountry = useSelectionStore((state) => state.toggleCountry);
+    const selectedCountryCodes = useFilterSelectionsStore((state) => state.selectedCountryCodes);
+    const toggleCountry = useFilterSelectionsStore((state) => state.toggleCountry);
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleCountryToggle = (countryCode: string) => {

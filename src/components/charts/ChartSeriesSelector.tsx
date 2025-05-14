@@ -1,7 +1,7 @@
 import React from 'react';
-import { useSelectionStore } from '../../store/selectionStore';
 import type { PlottableChartSeries } from '../../types/PlottableChartSeries.ts'
 import {EditableSeriesName} from "./EditableSeriesName.tsx";
+import {useChartSeriesStore} from "../../store/chartSeriesStore.ts";
 
 interface ChartSeriesSelectorProps {
     allAvailableSeries: PlottableChartSeries[];
@@ -10,8 +10,8 @@ interface ChartSeriesSelectorProps {
 export const ChartSeriesSelector: React.FC<ChartSeriesSelectorProps> = ({
                                                                             allAvailableSeries,
                                                                         }) => {
-    const plottedIndicatorKeys = useSelectionStore((state) => state.plottedIndicatorKeys);
-    const togglePlottedIndicator = useSelectionStore((state) => state.togglePlottedIndicator);
+    const plottedIndicatorKeys = useChartSeriesStore((state) => state.plottedIndicatorKeys);
+    const togglePlottedIndicator = useChartSeriesStore((state) => state.togglePlottedIndicator);
 
     if (!allAvailableSeries || allAvailableSeries.length === 0) {
         return null;

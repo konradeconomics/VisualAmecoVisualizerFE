@@ -9,9 +9,9 @@ import type {
     PlottableChartSeries
 } from '../../types/PlottableChartSeries';
 import { useThemeStore } from '../../store/themeStore';
-import { useSelectionStore } from '../../store/selectionStore';
 import { EditableAxisLabel } from './EditableAxisLabel';
 import {CustomTopLegend} from "./CustomTopLegend.tsx";
+import { useChartUISettingsStore } from "../../store/chartUISettingsStore.ts";
 
 const LINE_COLORS = [
     '#0ea5e9', '#ef4444', '#22c55e', '#eab308', '#8b5cf6', '#ec4899', '#f97316', '#14b8a6',
@@ -31,10 +31,10 @@ export const RechartsPlot: React.FC<RechartsPlotProps> = ({
                                                               seriesInfoForLines,
                                                           }) => {
     const { theme } = useThemeStore();
-    const showDotsOnLines = useSelectionStore((state) => state.showDotsOnLines);
+    const showDotsOnLines = useChartUISettingsStore((state) => state.showDotsOnLines);
 
-    const customYAxisLabels = useSelectionStore((state) => state.customYAxisLabels);
-    const setCustomYAxisLabel = useSelectionStore((state) => state.setCustomYAxisLabel);
+    const customYAxisLabels = useChartUISettingsStore((state) => state.customYAxisLabels);
+    const setCustomYAxisLabel = useChartUISettingsStore((state) => state.setCustomYAxisLabel);
 
     const tooltipContentStyle = useMemo(() => (theme === 'dark' ? { backgroundColor: 'rgba(50, 50, 50, 0.85)', border: '1px solid #4A5568', borderRadius: '0.375rem', color: '#e2e8f0' } : { backgroundColor: 'rgba(255, 255, 255, 0.9)', border: '1px solid #cbd5e0', borderRadius: '0.375rem', color: '#1a202c' }), [theme]);
     const tooltipTextStyle = useMemo(() => (theme === 'dark' ? { color: '#e2e8f0' } : { color: '#1a202c' }), [theme]);

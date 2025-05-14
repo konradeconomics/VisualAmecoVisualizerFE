@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useSelectionStore } from '../../store/selectionStore';
+import { useFilterSelectionsStore} from "../../store/filterSelectionStore.ts";
 
 const generateYears = (start: number, end: number): number[] => {
     const years = [];
@@ -10,8 +10,8 @@ const generateYears = (start: number, end: number): number[] => {
 export const YearSelector: React.FC = () => {
     const currentYear = new Date().getFullYear();
     const availableYears = useMemo(() => generateYears(1960, currentYear + 5), [currentYear]);
-    const selectedYears = useSelectionStore((state) => state.selectedYears);
-    const toggleYear = useSelectionStore((state) => state.toggleYear);
+    const selectedYears = useFilterSelectionsStore((state) => state.selectedYears);
+    const toggleYear = useFilterSelectionsStore((state) => state.toggleYear);
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleYearToggle = (year: number) => toggleYear(year);

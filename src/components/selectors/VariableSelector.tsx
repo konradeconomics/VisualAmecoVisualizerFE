@@ -1,15 +1,15 @@
 import React, { useState, useMemo } from 'react';
 import { useFilteredVariables } from '../../hooks/useFetchVariables';
-import { useSelectionStore } from '../../store/selectionStore';
+import { useFilterSelectionsStore} from "../../store/filterSelectionStore.ts";
 import type { VariableDto } from '../../types/dto/variable.dto';
 
 type SelectedVariable = { code: string; name: string };
 
 export const VariableSelector: React.FC = () => {
-    const selectedChapterIds = useSelectionStore((state) => state.selectedChapterIds);
-    const selectedSubchapterIds = useSelectionStore((state) => state.selectedSubchapterIds);
-    const selectedVariables = useSelectionStore((state) => state.selectedVariables);
-    const toggleVariable = useSelectionStore((state) => state.toggleVariable);
+    const selectedChapterIds = useFilterSelectionsStore((state) => state.selectedChapterIds);
+    const selectedSubchapterIds = useFilterSelectionsStore((state) => state.selectedSubchapterIds);
+    const selectedVariables = useFilterSelectionsStore((state) => state.selectedVariables);
+    const toggleVariable = useFilterSelectionsStore((state) => state.toggleVariable);
 
     const {
         data: availableVariables,

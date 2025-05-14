@@ -1,9 +1,9 @@
 import React from 'react';
-import { useSelectionStore } from '../../store/selectionStore';
+import { useChartUISettingsStore } from '../../store/chartUISettingsStore.ts';
 
 export const ChartDotToggle: React.FC = () => {
-    const showDotsOnLines = useSelectionStore((state) => state.showDotsOnLines);
-    const toggleShowDotsOnLines = useSelectionStore((state) => state.toggleShowDotsOnLines);
+    const showDotsOnLines = useChartUISettingsStore((state) => state.showDotsOnLines);
+    const toggleShowDotsOnLines = useChartUISettingsStore((state) => state.toggleShowDotsOnLines);
 
     return (
         <label className="flex items-center space-x-2 cursor-pointer text-sm text-gray-700 dark:text-gray-300 hover:text-sky-600 dark:hover:text-sky-400">

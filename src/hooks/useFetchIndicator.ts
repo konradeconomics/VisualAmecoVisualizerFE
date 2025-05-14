@@ -1,7 +1,8 @@
 import { useQueries } from '@tanstack/react-query';
 import { fetchSingleIndicatorSeries } from '../api/indicatorApi';
-import { useSelectionStore } from '../store/selectionStore';
 import type { IndicatorDto } from '../types/dto/indicator.dto';
+
+import { useFilterSelectionsStore} from "../store/filterSelectionStore.ts";
 
 export interface UseFetchSelectedIndicatorsResult {
     data: (IndicatorDto | null)[];
@@ -13,9 +14,9 @@ export interface UseFetchSelectedIndicatorsResult {
 }
 
 export const useFetchSelectedIndicators = (): UseFetchSelectedIndicatorsResult => {
-    const selectedCountryCodes = useSelectionStore((state) => state.selectedCountryCodes);
-    const selectedVariables = useSelectionStore((state) => state.selectedVariables); // Array of {code, name}
-    const selectedYears = useSelectionStore((state) => state.selectedYears);
+    const selectedCountryCodes = useFilterSelectionsStore((state) => state.selectedCountryCodes);
+    const selectedVariables = useFilterSelectionsStore((state) => state.selectedVariables); // Array of {code, name}
+    const selectedYears = useFilterSelectionsStore((state) => state.selectedYears);
 
     const queryConfigs = [];
     if (selectedCountryCodes.length > 0 && selectedVariables.length > 0) {

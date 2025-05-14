@@ -1,5 +1,6 @@
 import React from 'react';
-import { useSelectionStore } from '../../store/selectionStore';
+import { useFilterSelectionsStore } from "../../store/filterSelectionStore.ts";
+import type { SelectedVariable } from '../../store/storeUtils'; // Or wherever SelectedVariable is defined
 
 const SelectionTag: React.FC<{
     label: string;
@@ -33,7 +34,7 @@ export const CurrentSelectionsDisplay: React.FC = () => {
         toggleSubchapter,
         toggleVariable,
         toggleYear,
-    } = useSelectionStore();
+    } = useFilterSelectionsStore();
 
     const hasSelections =
         selectedCountryCodes.length > 0 ||
@@ -58,7 +59,7 @@ export const CurrentSelectionsDisplay: React.FC = () => {
                     <SelectionTag
                         key={`country-${code}`}
                         label="Country"
-                        value={code} // Displaying code as per ticket allowance
+                        value={code}
                         onRemove={() => toggleCountry(code)}
                     />
                 ))}
@@ -66,7 +67,7 @@ export const CurrentSelectionsDisplay: React.FC = () => {
                     <SelectionTag
                         key={`chapter-${id}`}
                         label="Chapter"
-                        value={id} // Displaying ID
+                        value={id}
                         onRemove={() => toggleChapter(id)}
                     />
                 ))}
@@ -74,16 +75,16 @@ export const CurrentSelectionsDisplay: React.FC = () => {
                     <SelectionTag
                         key={`subchapter-${id}`}
                         label="Subchapter"
-                        value={id} // Displaying ID
+                        value={id}
                         onRemove={() => toggleSubchapter(id)}
                     />
                 ))}
-                {selectedVariables.map((variable) => (
+                {selectedVariables.map((variable : SelectedVariable) => (
                     <SelectionTag
                         key={`variable-${variable.code}`}
                         label="Variable"
-                        value={`${variable.name} (${variable.code})`} // Displaying name and code
-                        onRemove={() => toggleVariable(variable)} // Pass the {code, name} object
+                        value={`${variable.name} (${variable.code})`}
+                        onRemove={() => toggleVariable(variable)}
                     />
                 ))}
                 {selectedYears.map((year) => (

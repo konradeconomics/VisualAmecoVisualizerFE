@@ -1,7 +1,8 @@
 import React, {useState, useEffect, useRef} from 'react';
-import { useSelectionStore } from '../../store/selectionStore';
 import type { PlottableChartSeries } from '../../types/PlottableChartSeries'; 
 import {Check, Edit3, Trash2, X} from 'lucide-react';
+
+import { useChartUISettingsStore } from "../../store/chartUISettingsStore.ts";
 
 interface EditableSeriesNameProps {
     series: PlottableChartSeries;
@@ -12,11 +13,11 @@ interface EditableSeriesNameProps {
 }
 
 export const EditableSeriesName: React.FC<EditableSeriesNameProps> = ({ series }) => {
-    const customNameFromStore = useSelectionStore(
+    const customNameFromStore = useChartUISettingsStore(
         (state) => state.customSeriesNames[series.displayKey]
     );
-    const setCustomStoreName = useSelectionStore((state) => state.setCustomSeriesName);
-    const clearCustomStoreName = useSelectionStore((state) => state.clearCustomSeriesName);
+    const setCustomStoreName = useChartUISettingsStore((state) => state.setCustomSeriesName);
+    const clearCustomStoreName = useChartUISettingsStore((state) => state.clearCustomSeriesName);
 
     const effectiveDisplayName = customNameFromStore || series.uiDisplayName;
 
