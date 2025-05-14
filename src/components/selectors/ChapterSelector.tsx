@@ -1,12 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { useFetchChapters } from '../../hooks/useFetchChapters'; // Adjust path
-import { useSelectionStore } from '../../store/selectionStore';  // Adjust path
+import { useFilterSelectionsStore} from "../../store/filterSelectionStore.ts";
+
 import type { ChapterDto } from '../../types/dto/chapter.dto';
 
 export const ChapterSelector: React.FC = () => {
     const { data: chapters, isLoading, isError, error } = useFetchChapters();
-    const selectedChapterIds = useSelectionStore((state) => state.selectedChapterIds);
-    const toggleChapter = useSelectionStore((state) => state.toggleChapter);
+    const selectedChapterIds = useFilterSelectionsStore((state) => state.selectedChapterIds);
+    const toggleChapter = useFilterSelectionsStore((state) => state.toggleChapter);
     const [searchTerm, setSearchTerm] = useState('');
 
     const handleChapterToggle = (id: number) => {
