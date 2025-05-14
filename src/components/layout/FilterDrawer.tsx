@@ -4,15 +4,17 @@ import { SubchapterSelector } from '../selectors/SubchapterSelector';
 import { VariableSelector } from '../selectors/VariableSelector';
 import { CountrySelector } from '../selectors/CountrySelector';
 import { YearSelector } from '../selectors/YearSelector';
-import { useSelectionStore } from '../../store/selectionStore';
+import { useResetAllStores} from "../../hooks/useResetAllStores.ts";
 
 interface FilterDrawerProps {
     onCloseDrawer: () => void; // Function to close the drawer
 }
 
 export const FilterDrawer: React.FC<FilterDrawerProps> = ({ onCloseDrawer }) => {
-    const resetAllSelections = useSelectionStore((state) => state.resetAllSelections);
-    const handleResetAll = () => resetAllSelections();
+    const resetAllApplicationStores = useResetAllStores();
+    const handleResetAll = () => {
+        resetAllApplicationStores();
+    };
     const handleApplyFilters = () => onCloseDrawer();
 
     return (

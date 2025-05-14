@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react';
 import { useFetchSelectedIndicators } from '../../hooks/useFetchIndicator';
-import { useSelectionStore } from '../../store/selectionStore';
 import { getReadableUnit, getUnitCategory } from '../../utils/unitMapper';
 import type { PlottableChartSeries } from '../../types/PlottableChartSeries';
 import { ChartSeriesSelector } from './ChartSeriesSelector';
@@ -8,11 +7,14 @@ import { useChartDataPreparation } from '../../hooks/useChartDataPreparation';
 import { RechartsPlot } from './RechartsPlot';
 import { ChartDotToggle } from '../controls/ChartDotToggle';
 
+import { useChartSeriesStore } from "../../store/chartSeriesStore.ts";
+import { useChartUISettingsStore} from "../../store/chartUISettingsStore.ts";
+
 export const IndicatorChart: React.FC = () => {
     const { allData: fetchedIndicatorsData, isLoading, isFetching, isError, errors } = useFetchSelectedIndicators();
-    const plottedIndicatorKeys = useSelectionStore((state) => state.plottedIndicatorKeys);
-    const allCalculatedSeries = useSelectionStore((state) => state.calculatedSeries);
-    const customSeriesNames = useSelectionStore((state) => state.customSeriesNames);
+    const plottedIndicatorKeys = useChartSeriesStore((state) => state.plottedIndicatorKeys);
+    const allCalculatedSeries = useChartSeriesStore((state) => state.calculatedSeries);
+    const customSeriesNames = useChartUISettingsStore((state) => state.customSeriesNames);
 
     const allAvailableSeriesForSelection = useMemo((): PlottableChartSeries[] => {
         const fetchedAsPlottable: PlottableChartSeries[] = (fetchedIndicatorsData || []).map(ind => {
