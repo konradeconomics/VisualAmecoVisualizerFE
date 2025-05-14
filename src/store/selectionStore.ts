@@ -4,6 +4,7 @@ import type { CalculatedSeriesDto } from '../types/dto/calculatedSeries.dto';
 
 type SelectedVariable = { code: string; name: string };
 type IndicatorSeriesKey = string;
+type YAxisId = string;
 
 interface ChartInteractionState {
     plottedIndicatorKeys: Set<IndicatorSeriesKey>;
@@ -12,6 +13,8 @@ interface ChartInteractionState {
     showDotsOnLines: boolean;
 
     customSeriesNames: Record<string, string>;
+    
+    customYAxisLabels: Record<string, string>;
 
     togglePlottedIndicator: (key: IndicatorSeriesKey) => void;
     setPlottedIndicators: (keys: Set<IndicatorSeriesKey>) => void; // For setting defaults or clearing
@@ -21,6 +24,9 @@ interface ChartInteractionState {
 
     setCustomSeriesName: (seriesKey: IndicatorSeriesKey, customName: string) => void;
     clearCustomSeriesName: (seriesKey: IndicatorSeriesKey) => void;
+
+    setCustomYAxisLabel: (yAxisId: YAxisId, label: string) => void;
+    clearCustomYAxisLabel: (yAxisId: YAxisId) => void;
 }
 
 interface MultiSelectionState {
@@ -77,6 +83,7 @@ export const useSelectionStore = create<MultiSelectionState & ChartInteractionSt
 
     showDotsOnLines: true,
     customSeriesNames: {},
+    customYAxisLabels: {},
 
     plottedIndicatorKeys: new Set(),
     calculatedSeries: [],
@@ -180,5 +187,20 @@ export const useSelectionStore = create<MultiSelectionState & ChartInteractionSt
             const newCustomNames = { ...state.customSeriesNames };
             delete newCustomNames[seriesKey];
             return { customSeriesNames: newCustomNames };
+        }),
+
+    setCustomYAxisLabel: (yAxisId, label) =>
+        set((state) => ({
+            customYAxisLabels: {
+                ...state.customYAxisLabels,
+                [yAxisId]: label,
+            },
+        })),
+
+    clearCustomYAxisLabel: (yAxisId) =>
+        set((state) => {
+            const newCustomLabels = { ...state.customYAxisLabels };
+            delete newCustomLabels[yAxisId];
+            return { customYAxisLabels: newCustomLabels };
         }),
 }));
