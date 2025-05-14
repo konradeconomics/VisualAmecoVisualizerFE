@@ -4,8 +4,9 @@ import type { IndicatorDto} from '../../types/dto/indicator.dto';
 import {getReadableUnit, getUnitCategory} from '../../utils/unitMapper';
 import type { CalculatedSeriesDto } from '../../types/dto/calculatedSeries.dto';
 import {useFetchSelectedIndicators} from "../../hooks/useFetchIndicator.ts";
-import {useSelectionStore} from "../../store/selectionStore.ts";
 import type {YearValueDto} from "../../types/dto/yearValue.dto.ts";
+
+import {useChartSeriesStore} from "../../store/chartSeriesStore.ts";
 
 interface SelectableSeriesInfo {
     key: string;
@@ -16,9 +17,9 @@ interface SelectableSeriesInfo {
 
 export const GraphLogicControls: React.FC = () => {
     const { allData: fetchedIndicators } = useFetchSelectedIndicators();
-    const allCalculatedSeriesFromStore = useSelectionStore((state) => state.calculatedSeries);
-    const plottedIndicatorKeys = useSelectionStore((state) => state.plottedIndicatorKeys);
-    const addCalculatedSeries = useSelectionStore((state) => state.addCalculatedSeries);
+    const allCalculatedSeriesFromStore = useChartSeriesStore((state) => state.calculatedSeries);
+    const plottedIndicatorKeys = useChartSeriesStore((state) => state.plottedIndicatorKeys);
+    const addCalculatedSeries = useChartSeriesStore((state) => state.addCalculatedSeries);
 
     const [seriesAKey, setSeriesAKey] = useState<string | null>(null);
     const [seriesBKey, setSeriesBKey] = useState<string | null>(null);
