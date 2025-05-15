@@ -1,14 +1,15 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import { useFetchSelectedIndicators } from '../../hooks/useFetchIndicator';
 import { getReadableUnit, getUnitCategory } from '../../utils/unitMapper';
 import type { PlottableChartSeries } from '../../types/PlottableChartSeries';
 import { ChartSeriesSelector } from './ChartSeriesSelector';
-import { useChartDataPreparation } from '../../hooks/useChartDataPreparation'; 
-import { RechartsPlot } from './RechartsPlot';
+import { useChartDataPreparation } from '../../hooks/useChartDataPreparation';
+import { RechartsPlot, type RechartsPlotRef } from './RechartsPlot';
 import { ChartDotToggle } from '../controls/ChartDotToggle';
+import { DownloadSVGButton } from '../controls/DownloadSVGButton';
 
-import { useChartSeriesStore } from "../../store/chartSeriesStore.ts";
-import { useChartUISettingsStore} from "../../store/chartUISettingsStore.ts";
+import { useChartSeriesStore } from "../../store/chartSeriesStore";
+import { useChartUISettingsStore} from "../../store/chartUISettingsStore"; 
 
 export const IndicatorChart: React.FC = () => {
     const { allData: fetchedIndicatorsData, isLoading, isFetching, isError, errors } = useFetchSelectedIndicators();
@@ -16,13 +17,14 @@ export const IndicatorChart: React.FC = () => {
     const allCalculatedSeries = useChartSeriesStore((state) => state.calculatedSeries);
     const customSeriesNames = useChartUISettingsStore((state) => state.customSeriesNames);
 
+    const rechartsPlotRef = useRef<RechartsPlotRef>(null);
+
     const allAvailableSeriesForSelection = useMemo((): PlottableChartSeries[] => {
         const fetchedAsPlottable: PlottableChartSeries[] = (fetchedIndicatorsData || []).map(ind => {
             const displayKey = `${ind.countryCode}-${ind.variableCode}`;
             const readableUnit = getReadableUnit(ind.unitCode, ind.unitDescription);
-
             const baseDisplayName = `${ind.countryName} - ${ind.variableName} (${readableUnit})`;
-            const finalDisplayName = customSeriesNames[displayKey] || baseDisplayName; // Use custom name if it exists
+            const finalDisplayName = customSeriesNames[displayKey] || baseDisplayName;
 
             return {
                 ...ind,
@@ -45,7 +47,7 @@ export const IndicatorChart: React.FC = () => {
             };
         });
         return [...fetchedAsPlottable, ...calculatedAsPlottable];
-    }, [fetchedIndicatorsData, allCalculatedSeries]);
+    }, [fetchedIndicatorsData, allCalculatedSeries, customSeriesNames]);
 
     const indicatorsToPlot = useMemo((): PlottableChartSeries[] => {
         return allAvailableSeriesForSelection.filter(series =>
@@ -59,6 +61,25 @@ export const IndicatorChart: React.FC = () => {
         pivotedChartData
     } = useChartDataPreparation(indicatorsToPlot);
 
+    const handleDownloadSVG = () => {
+        if (rechartsPlotRef.current) {
+            const svgString = rechartsPlotRef.current.getSVGString();
+            if (svgString) {
+                const blob = new Blob([svgString], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'VisualAmeco-Chart.svg';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            } else {
+                console.error("Failed to get SVG string from chart.");
+            }
+        }
+    };
+
     // ----- Loading/Error States -----
     if (isLoading && !isFetching && allAvailableSeriesForSelection.length === 0 ) {
         return <div className="p-4 text-center text-gray-500 dark:text-gray-400">Loading chart data...</div>;
@@ -71,23 +92,32 @@ export const IndicatorChart: React.FC = () => {
         return <div className="p-4 text-center text-gray-500 dark:text-gray-400 italic">No indicators available. Make selections in filters.</div>;
     }
 
+    const canDownload = indicatorsToPlot.length > 0 && pivotedChartData.length > 0;
+
     return (
         <div className="p-4 border border-gray-200 dark:border-slate-700 rounded-lg shadow bg-white dark:bg-slate-800 h-[600px] md:h-[750px] lg:h-[85vh] w-full flex flex-col">
-            {allAvailableSeriesForSelection.length > 0 && (
-                <ChartSeriesSelector
-                    allAvailableSeries={allAvailableSeriesForSelection}
-                />
-            )}
+            <div className="flex justify-between items-center mb-2 shrink-0">
+                {allAvailableSeriesForSelection.length > 0 && (
+                    <ChartSeriesSelector
+                        allAvailableSeries={allAvailableSeriesForSelection}
+                    />
+                )}
+                {/* Placeholder for alignment if ChartSeriesSelector is not shown */}
+                {allAvailableSeriesForSelection.length === 0 && <div />}
 
-            <div className="mb-2 shrink-0 flex justify-start">
-                <ChartDotToggle />
+                <div className="flex items-center space-x-2">
+                    <ChartDotToggle />
+                    <DownloadSVGButton onClick={handleDownloadSVG} disabled={!canDownload} />
+                </div>
             </div>
+
 
             {isFetching && (<div className="p-1 text-xs text-center text-sky-600 dark:text-sky-400 shrink-0">Updating chart...</div>)}
 
-            <div className="flex-grow min-h-0">
+            <div className="flex-grow min-h-0"> {/* This div is crucial for ResponsiveContainer to work */}
                 {indicatorsToPlot.length > 0 && pivotedChartData.length > 0 && yAxisConfig && yAxisConfig.length > 0 ? (
                     <RechartsPlot
+                        ref={rechartsPlotRef} // Assign the ref here
                         pivotedData={pivotedChartData}
                         yAxisConfig={yAxisConfig}
                         seriesInfoForLines={unitInfoForPlotting}
