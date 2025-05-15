@@ -1,14 +1,17 @@
 import { create } from 'zustand';
+import { togglePrimitiveArrayItem, toggleSelectedVariableArrayItem, type SelectedVariable } from './storeUtils'; // Assuming storeUtils.ts is in the same directory
 
-type SelectedVariable = { code: string; name: string };
-
-interface MultiSelectionState {
+// Interface for the state managed by this store
+interface FilterSelectionsState {
     selectedCountryCodes: string[];
     selectedVariables: SelectedVariable[];
     selectedYears: number[];
     selectedChapterIds: number[];
     selectedSubchapterIds: number[];
+}
 
+// Interface for the actions available in this store
+interface FilterSelectionsActions {
     toggleCountry: (code: string) => void;
     toggleVariable: (variable: SelectedVariable) => void;
     toggleYear: (year: number) => void;
@@ -20,30 +23,24 @@ interface MultiSelectionState {
     clearYearSelections: () => void;
     clearChapterSelections: () => void;
     clearSubchapterSelections: () => void;
-    resetAllSelections: () => void;
+
+    resetFilterSelections: () => void;
 }
 
-const toggleVariableArrayItem = (
-    array: SelectedVariable[],
-    itemToAddOrRemove: SelectedVariable
-): SelectedVariable[] => {
-    const exists = array.some((item) => item.code === itemToAddOrRemove.code);
-    if (exists) {
-        return array.filter((item) => item.code !== itemToAddOrRemove.code);
-    } else {
-        return [...array, itemToAddOrRemove];
-    }
-};
-
-const togglePrimitiveArrayItem = <T>(array: T[], item: T): T[] =>
-    array.includes(item) ? array.filter((i) => i !== item) : [...array, item];
-
-export const useSelectionStore = create<MultiSelectionState>((set) => ({
+// Initial state for filter selections
+const initialFilterState: FilterSelectionsState = {
     selectedCountryCodes: [],
-    selectedVariables: [], // **** CHANGED: Initialize as empty array for objects ****
+    selectedVariables: [],
     selectedYears: [],
     selectedChapterIds: [],
     selectedSubchapterIds: [],
+};
+
+/**
+ * Zustand store for managing user selections related to data filtering.
+ */
+export const useFilterSelectionsStore = create<FilterSelectionsState & FilterSelectionsActions>((set) => ({
+    ...initialFilterState,
 
     toggleCountry: (code) =>
         set((state) => ({
@@ -52,7 +49,7 @@ export const useSelectionStore = create<MultiSelectionState>((set) => ({
 
     toggleVariable: (variable) =>
         set((state) => ({
-            selectedVariables: toggleVariableArrayItem(state.selectedVariables, variable),
+            selectedVariables: toggleSelectedVariableArrayItem(state.selectedVariables, variable),
         })),
 
     toggleYear: (year) =>
@@ -72,17 +69,17 @@ export const useSelectionStore = create<MultiSelectionState>((set) => ({
         })),
 
     clearCountrySelections: () => set({ selectedCountryCodes: [] }),
-    clearVariableSelections: () => set({ selectedVariables: [] }), // **** CHANGED ****
+    clearVariableSelections: () => set({ selectedVariables: [] }),
     clearYearSelections: () => set({ selectedYears: [] }),
     clearChapterSelections: () =>
-        set({ selectedChapterIds: [], selectedSubchapterIds: [] }),
-    clearSubchapterSelections: () => set({ selectedSubchapterIds: [] }),
-    resetAllSelections: () =>
         set({
-            selectedCountryCodes: [],
-            selectedVariables: [], // **** CHANGED ****
-            selectedYears: [],
             selectedChapterIds: [],
             selectedSubchapterIds: [],
         }),
+    clearSubchapterSelections: () =>
+        set({
+            selectedSubchapterIds: [],
+        }),
+
+    resetFilterSelections: () => set(initialFilterState),
 }));

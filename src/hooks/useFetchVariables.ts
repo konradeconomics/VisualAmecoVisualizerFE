@@ -4,7 +4,7 @@ import {
     fetchVariablesByChapter,
 } from '../api/variableApi';
 import type { VariableDto } from '../types/dto/variable.dto';
-import { useSelectionStore } from '../store/selectionStore';
+import { useFilterSelectionsStore} from "../store/filterSelectionStore.ts";
 
 export interface UseFilteredVariablesResult {
     data: VariableDto[];
@@ -16,8 +16,8 @@ export interface UseFilteredVariablesResult {
 }
 
 export const useFilteredVariables = (): UseFilteredVariablesResult => {
-    const chapterIds = useSelectionStore((state) => state.selectedChapterIds);
-    const subchapterIds = useSelectionStore((state) => state.selectedSubchapterIds);
+    const chapterIds = useFilterSelectionsStore((state) => state.selectedChapterIds);
+    const subchapterIds = useFilterSelectionsStore((state) => state.selectedSubchapterIds);
 
     let queryOptions: any[] = []; // Use 'any' for query options array flexibility with useQueries
     let isFetchingBasedOn: 'chapters' | 'subchapters' | 'none' = 'none';
@@ -71,6 +71,6 @@ export const useFilteredVariables = (): UseFilteredVariablesResult => {
     } else {
         fetchStatus = 'success';
     }
-    
+
     return { data: uniqueData, isLoading, isError, errors, fetchStatus, isFetchingBasedOn };
 };

@@ -5,15 +5,15 @@ import {VariableSelector} from "../components/selectors/VariableSelector.tsx";
 import { CountrySelector } from '../components/selectors/CountrySelector';
 import { YearSelector } from '../components/selectors/YearSelector';
 
-import { useSelectionStore } from '../store/selectionStore';
 import {IndicatorDataTable} from "../components/display/IndicatorDataTable.tsx";
-import {IndicatorSimpleChart} from "../components/charts/IndicatorSimpleChart.tsx";
+import {IndicatorChart} from "../components/charts/IndicatorChart.tsx";
+import { useResetAllStores} from "../hooks/useResetAllStores.ts";
 
 export const FilterDevelopmentPage: React.FC = () => {
-    const resetAllSelections = useSelectionStore((state) => state.resetAllSelections);
+    const resetAllApplicationStores = useResetAllStores();
 
     const handleResetAll = () => {
-        resetAllSelections();
+        resetAllApplicationStores();
         console.log('All selections have been reset.');
     };
 
@@ -27,7 +27,6 @@ export const FilterDevelopmentPage: React.FC = () => {
             </header>
 
             <div className="flex-grow flex flex-col lg:flex-row gap-4 md:gap-6 lg:items-start">
-                {/* Column 1: Chapter -> Subchapter -> Variable */}
                 <div className="lg:w-3/5 flex flex-col md:flex-row gap-4 md:gap-6">
                     <div className="flex-1 min-w-0 flex flex-col">
                         <h2 className="text-lg md:text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300 truncate shrink-0">Chapters</h2>
@@ -43,7 +42,6 @@ export const FilterDevelopmentPage: React.FC = () => {
                     </div>
                 </div>
 
-                {/* Column 2: Countries and Years */}
                 <div className="lg:w-2/5 flex flex-col gap-4 md:gap-6">
                     <div className="flex flex-col">
                         <h2 className="text-lg md:text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300 shrink-0">Countries</h2>
@@ -53,15 +51,14 @@ export const FilterDevelopmentPage: React.FC = () => {
                         <h2 className="text-lg md:text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300 shrink-0">Years</h2>
                         <YearSelector />
                     </div>
-                    {/* Display area for the Indicator Data Table */}
-                    <div className="mt-4"> {/* Add some margin if needed */}
+                    <div className="mt-4">
                         <h2 className="text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300">Indicator Data</h2>
                         <IndicatorDataTable />
                     </div>
 
-                    <div className="mt-1"> {/* Section for Chart */}
+                    <div className="mt-1">
                         <h2 className="text-xl font-semibold mb-2 text-gray-700 dark:text-gray-300">Indicator Chart</h2>
-                        <IndicatorSimpleChart />
+                        <IndicatorChart />
                     </div>
                 </div>
             </div>
@@ -75,7 +72,7 @@ export const FilterDevelopmentPage: React.FC = () => {
                     Reset All
                 </button>
                 <button className="px-4 py-2 text-sm bg-sky-600 hover:bg-sky-700 text-white rounded">
-                    Apply Filters {/* non-functional for now */}
+                    Apply Filters
                 </button>
             </footer>
         </div>

@@ -23,7 +23,6 @@ export const IndicatorDataTable: React.FC = () => {
         //errors,
     } = useFetchSelectedIndicators();
 
-    // 1. Determine all unique years - this uses rawIndicators
     const allYears = useMemo(() => {
         if (!rawIndicators || rawIndicators.length === 0) return [];
         const yearSet = new Set<number>();
@@ -33,7 +32,6 @@ export const IndicatorDataTable: React.FC = () => {
         return Array.from(yearSet).sort((a, b) => a - b);
     }, [rawIndicators]);
 
-    // 2. Transform/Group data for the consolidated table - this uses rawIndicators
     const groupedAndPivotedData = useMemo((): GroupedIndicatorData[] => {
         if (!rawIndicators || rawIndicators.length === 0) return [];
 
@@ -55,19 +53,17 @@ export const IndicatorDataTable: React.FC = () => {
             countryGroup.variables.push({
                 variableCode: indicator.variableCode,
                 variableName: indicator.variableName,
-                unit: indicator.unit,
+                unit: indicator.unitDescription,
                 yearData: yearDataForVariable,
             });
         });
         return Array.from(groupedByCountry.values());
     }, [rawIndicators]);
 
-    // --- Loading, Error, Empty States (can use rawIndicators for some checks) ---
     if (isLoading && !isFetching && (!rawIndicators || rawIndicators.length === 0) ) { // Check rawIndicators length
         return <div className="p-4 text-center text-gray-500 dark:text-gray-400">Loading indicator data...</div>;
     }
-    // ... (rest of your loading, error, empty state handling based on isLoading, isError, and rawIndicators.length) ...
-    // Example for empty state after successful fetch:
+    
     if (!isLoading && !isError && (!rawIndicators || rawIndicators.length === 0)) {
         return (
             <div className="p-4 text-center text-gray-500 dark:text-gray-400">

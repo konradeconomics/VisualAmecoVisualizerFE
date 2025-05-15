@@ -1,13 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import { useFetchSubchapters } from '../../hooks/useFetchSubchapters';
-import { useSelectionStore } from '../../store/selectionStore';
+import { useFilterSelectionsStore} from "../../store/filterSelectionStore.ts";
 import type {SubchapterDto} from '../../types/dto/subchapter.dto';
 
 
 export const SubchapterSelector: React.FC = () => {
-    const selectedChapterIds = useSelectionStore((state) => state.selectedChapterIds);
-    const selectedSubchapterIds = useSelectionStore((state) => state.selectedSubchapterIds);
-    const toggleSubchapter = useSelectionStore((state) => state.toggleSubchapter);
+    const selectedChapterIds = useFilterSelectionsStore((state) => state.selectedChapterIds);
+    const selectedSubchapterIds = useFilterSelectionsStore((state) => state.selectedSubchapterIds);
+    const toggleSubchapter = useFilterSelectionsStore((state) => state.toggleSubchapter);
 
     const { data: subchapters, isLoading, isError, errors } = useFetchSubchapters(selectedChapterIds);
     const [searchTerm, setSearchTerm] = useState('');

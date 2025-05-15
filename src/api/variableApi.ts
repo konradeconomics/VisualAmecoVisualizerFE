@@ -11,7 +11,6 @@ export const fetchVariablesBySubchapter = async (
     if (!subchapterId) {
         return Promise.resolve([]);
     }
-    // Log the specific API call being made
     console.log(`Workspaceing variables for subchapterId: ${subchapterId}`);
     return apiClient<VariableDto[]>(`/variables?subchapterId=${subchapterId}`);
 };
@@ -26,7 +25,6 @@ export const fetchVariablesByChapter = async (
     if (!chapterId) {
         return Promise.resolve([]);
     }
-    // Log the specific API call being made
     console.log(`Workspaceing variables for chapterId: ${chapterId}`);
     return apiClient<VariableDto[]>(`/variables?chapterId=${chapterId}`);
 };

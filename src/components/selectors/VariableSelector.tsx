@@ -1,23 +1,21 @@
 import React, { useState, useMemo } from 'react';
 import { useFilteredVariables } from '../../hooks/useFetchVariables';
-import { useSelectionStore } from '../../store/selectionStore';
+import { useFilterSelectionsStore} from "../../store/filterSelectionStore.ts";
 import type { VariableDto } from '../../types/dto/variable.dto';
 
 type SelectedVariable = { code: string; name: string };
 
 export const VariableSelector: React.FC = () => {
-    const selectedChapterIds = useSelectionStore((state) => state.selectedChapterIds);
-    const selectedSubchapterIds = useSelectionStore((state) => state.selectedSubchapterIds);
-    const selectedVariables = useSelectionStore((state) => state.selectedVariables);
-    const toggleVariable = useSelectionStore((state) => state.toggleVariable);
+    const selectedChapterIds = useFilterSelectionsStore((state) => state.selectedChapterIds);
+    const selectedSubchapterIds = useFilterSelectionsStore((state) => state.selectedSubchapterIds);
+    const selectedVariables = useFilterSelectionsStore((state) => state.selectedVariables);
+    const toggleVariable = useFilterSelectionsStore((state) => state.toggleVariable);
 
     const {
         data: availableVariables,
         isLoading,
         isError,
         errors,
-        // fetchStatus, // Keep these if your hook returns them
-        // isFetchingBasedOn
     } = useFilteredVariables();
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -33,12 +31,12 @@ export const VariableSelector: React.FC = () => {
         );
     }, [availableVariables, searchTerm]);
 
-    const isDisabled = selectedChapterIds.length === 0 && selectedSubchapterIds.length === 0;
+    const isDisabled = selectedChapterIds.length === 0 && selectedSubchapterIds.length === 0 && selectedVariables.length === 0;
 
     const isVariableSelectedInStore = (code: string): boolean => selectedVariables.some(v => v.code === code);
 
     const renderAvailableVarsContent = () => {
-        if (isDisabled) return null; // Outer component handles disabled state
+        if (isDisabled) return null;
         if (isLoading) return <div className="p-3 text-sm text-center text-gray-500 dark:text-gray-400 flex-grow flex items-center justify-center">Loading variables...</div>;
         if (isError) return <div className="p-3 text-sm text-center text-red-500 flex-grow flex items-center justify-center">Error: {errors?.[0]?.message || 'Unknown error'}</div>;
         if ((!availableVariables || availableVariables.length === 0)) return <div className="p-3 text-sm text-center text-gray-500 dark:text-gray-400 flex-grow flex items-center justify-center">No variables for current selection.</div>;
@@ -50,7 +48,7 @@ export const VariableSelector: React.FC = () => {
                 <div
                     key={variable.code}
                     onClick={() => handleVariableToggle({ code: variable.code, name: variable.name })}
-                    title={`${variable.name} (${variable.code}) - Unit: ${variable.unit}`}
+                    title={`${variable.name} (${variable.code}) - Unit: ${variable.unitDescription}`}
                     className={`p-2 rounded-md cursor-pointer border flex items-center group justify-between text-sm transition-all duration-150 ease-in-out ${
                         isSelected
                             ? 'bg-sky-500 text-white border-sky-600 shadow-sm dark:bg-sky-600 dark:border-sky-700'
