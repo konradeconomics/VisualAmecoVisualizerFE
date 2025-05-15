@@ -16,8 +16,6 @@ export const VariableSelector: React.FC = () => {
         isLoading,
         isError,
         errors,
-        // fetchStatus, // Keep these if your hook returns them
-        // isFetchingBasedOn
     } = useFilteredVariables();
 
     const [searchTerm, setSearchTerm] = useState('');
@@ -33,12 +31,12 @@ export const VariableSelector: React.FC = () => {
         );
     }, [availableVariables, searchTerm]);
 
-    const isDisabled = selectedChapterIds.length === 0 && selectedSubchapterIds.length === 0;
+    const isDisabled = selectedChapterIds.length === 0 && selectedSubchapterIds.length === 0 && selectedVariables.length === 0;
 
     const isVariableSelectedInStore = (code: string): boolean => selectedVariables.some(v => v.code === code);
 
     const renderAvailableVarsContent = () => {
-        if (isDisabled) return null; // Outer component handles disabled state
+        if (isDisabled) return null;
         if (isLoading) return <div className="p-3 text-sm text-center text-gray-500 dark:text-gray-400 flex-grow flex items-center justify-center">Loading variables...</div>;
         if (isError) return <div className="p-3 text-sm text-center text-red-500 flex-grow flex items-center justify-center">Error: {errors?.[0]?.message || 'Unknown error'}</div>;
         if ((!availableVariables || availableVariables.length === 0)) return <div className="p-3 text-sm text-center text-gray-500 dark:text-gray-400 flex-grow flex items-center justify-center">No variables for current selection.</div>;

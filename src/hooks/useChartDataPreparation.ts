@@ -7,6 +7,7 @@ const HIERARCHICAL_LINE_STYLES: (string | undefined)[] = [
     undefined, '5 5', '1 5', '10 2 2 2', '3 7',
 ];
 const DEFAULT_AXIS_LINE_STYLE = undefined;
+const MAX_Y_AXES_TO_DISPLAY = 4;
 
 interface ChartDataPreparationResult {
     unitInfoForPlotting: LineRenderInfo[];
@@ -32,12 +33,14 @@ export const useChartDataPreparation = (
     const yAxisConfig = useMemo((): YAxisConfigEntry[] => {
         if (!unitInfoForPlotting || unitInfoForPlotting.length === 0) {
             return [{
-                yAxisId: 'left0', orientation: 'left' as const,
+                yAxisId: 'left0',
+                orientation: 'left' as const,
                 unitTypeLabel: 'Value',
                 axisColor: theme === 'dark' ? '#9ca3af' : '#6b7280',
                 lineStrokeDasharray: DEFAULT_AXIS_LINE_STYLE
             }];
         }
+
         const orderedUniqueCategories: UnitCategory[] = [];
         unitInfoForPlotting.forEach(info => {
             if (!orderedUniqueCategories.includes(info.category)) {
@@ -46,20 +49,18 @@ export const useChartDataPreparation = (
         });
 
         const configs: YAxisConfigEntry[] = [];
-        let leftAxesCount = 0;
-        let rightAxesCount = 0;
-        const maxAxesPerSide = 2;
 
         orderedUniqueCategories.forEach((category, index) => {
-            if (configs.length >= (maxAxesPerSide * 2)) return;
+            if (configs.length >= MAX_Y_AXES_TO_DISPLAY) return;
+
             let assignedOrientation: 'left' | 'right';
-            if (leftAxesCount < maxAxesPerSide) {
-                assignedOrientation = 'left'; leftAxesCount++;
-            } else if (rightAxesCount < maxAxesPerSide) {
-                assignedOrientation = 'right'; rightAxesCount++;
-            } else {
+            
+            if (index % 2 === 0) { 
                 assignedOrientation = 'left';
+            } else {
+                assignedOrientation = 'right';
             }
+
             configs.push({
                 yAxisId: category,
                 orientation: assignedOrientation,
@@ -70,24 +71,36 @@ export const useChartDataPreparation = (
         });
 
         if (configs.length === 0) {
-            return [{ yAxisId: 'left0', orientation: 'left' as const, unitTypeLabel: 'Value', axisColor: theme === 'dark' ? '#9ca3af' : '#6b7280', lineStrokeDasharray: DEFAULT_AXIS_LINE_STYLE }];
+            return [{
+                yAxisId: 'left0',
+                orientation: 'left' as const,
+                unitTypeLabel: 'Value',
+                axisColor: theme === 'dark' ? '#9ca3af' : '#6b7280',
+                lineStrokeDasharray: DEFAULT_AXIS_LINE_STYLE
+            }];
         }
         return configs;
     }, [unitInfoForPlotting, theme]);
 
     const pivotedChartData = useMemo((): ChartDataPoint[] => {
         if (!indicatorsToPlot || indicatorsToPlot.length === 0) return [];
+
         const yearMap = new Map<number, ChartDataPoint>();
-        indicatorsToPlot.forEach(s => {
-            s.values.forEach(val => {
-                if (!yearMap.has(val.year)) { yearMap.set(val.year, { year: val.year }); }
+        indicatorsToPlot.forEach(series => {
+            series.values.forEach(valuePoint => {
+                if (!yearMap.has(valuePoint.year)) {
+                    yearMap.set(valuePoint.year, { year: valuePoint.year });
+                }
             });
         });
-        indicatorsToPlot.forEach(s => {
-            const seriesKey: string = s.displayKey;
-            s.values.forEach(val => {
-                const yearDataPoint = yearMap.get(val.year);
-                if (yearDataPoint) { yearDataPoint[seriesKey] = val.amount; }
+
+        indicatorsToPlot.forEach(series => {
+            const seriesKey: string = series.displayKey;
+            series.values.forEach(valuePoint => {
+                const yearDataPoint = yearMap.get(valuePoint.year);
+                if (yearDataPoint) {
+                    yearDataPoint[seriesKey] = valuePoint.amount;
+                }
             });
         });
         return Array.from(yearMap.values()).sort((a, b) => a.year - b.year);
