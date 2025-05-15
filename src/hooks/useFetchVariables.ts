@@ -71,6 +71,6 @@ export const useFilteredVariables = (): UseFilteredVariablesResult => {
     } else {
         fetchStatus = 'success';
     }
-    
+
     return { data: uniqueData, isLoading, isError, errors, fetchStatus, isFetchingBasedOn };
 };

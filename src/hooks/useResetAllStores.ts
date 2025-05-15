@@ -1,6 +1,6 @@
 import { useFilterSelectionsStore} from "../store/filterSelectionStore.ts";
-import { useChartSeriesStore } from '../store/chartSeriesStore.ts';       // Adjust path as needed
-import { useChartUISettingsStore } from '../store/chartUISettingsStore.ts'; // Adjust path as needed
+import { useChartSeriesStore } from '../store/chartSeriesStore.ts';       
+import { useChartUISettingsStore } from '../store/chartUISettingsStore.ts';
 
 /**
  * Custom hook that provides a function to reset all relevant application state

@@ -60,22 +60,26 @@ export const useFilterSelectionsStore = create<FilterSelectionsState & FilterSel
     toggleChapter: (id) =>
         set((state) => ({
             selectedChapterIds: togglePrimitiveArrayItem(state.selectedChapterIds, id),
-            selectedSubchapterIds: [], // Reset subchapters when a chapter is toggled (as per original logic)
-            selectedVariables: [],   // Reset variables when chapter changes (common pattern, adjust if needed)
+            selectedSubchapterIds: [],
         })),
 
     toggleSubchapter: (id) =>
         set((state) => ({
             selectedSubchapterIds: togglePrimitiveArrayItem(state.selectedSubchapterIds, id),
-            selectedVariables: [], // Reset variables when subchapter changes (common pattern, adjust if needed)
         })),
 
     clearCountrySelections: () => set({ selectedCountryCodes: [] }),
     clearVariableSelections: () => set({ selectedVariables: [] }),
     clearYearSelections: () => set({ selectedYears: [] }),
     clearChapterSelections: () =>
-        set({ selectedChapterIds: [], selectedSubchapterIds: [], selectedVariables: [] }), // Also clear variables
-    clearSubchapterSelections: () => set({ selectedSubchapterIds: [], selectedVariables: [] }), // Also clear variables
+        set({
+            selectedChapterIds: [],
+            selectedSubchapterIds: [],
+        }),
+    clearSubchapterSelections: () =>
+        set({
+            selectedSubchapterIds: [],
+        }),
 
     resetFilterSelections: () => set(initialFilterState),
 }));
