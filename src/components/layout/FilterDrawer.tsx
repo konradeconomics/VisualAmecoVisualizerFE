@@ -7,7 +7,7 @@ import { YearSelector } from '../selectors/YearSelector';
 import { useResetAllStores} from "../../hooks/useResetAllStores.ts";
 
 interface FilterDrawerProps {
-    onCloseDrawer: () => void; // Function to close the drawer
+    onCloseDrawer: () => void;
 }
 
 export const FilterDrawer: React.FC<FilterDrawerProps> = ({ onCloseDrawer }) => {
