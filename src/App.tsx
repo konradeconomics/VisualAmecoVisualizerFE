@@ -51,7 +51,7 @@ export const App: React.FC = () => {
                 {/* Overlay when drawer is open (for mobile/tablet) */}
                 {isFilterDrawerOpen && (
                     <div
-                        onClick={closeFilterDrawer} // Close drawer on overlay click
+                        onClick={closeFilterDrawer}
                         className="fixed inset-0 z-20 bg-black/50 sm:hidden"
                     ></div>
                 )}
