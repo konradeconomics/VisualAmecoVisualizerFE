@@ -36,22 +36,22 @@ export const getUnitCategory = (readableUnit: string): UnitCategory => {
     const unitLower = readableUnit.toLowerCase();
 
     // Most specific checks first
-    if (unitLower.includes("(2015 = 100)") || unitLower.includes("2015=100")) { // Covers various index formats
+    if (unitLower.includes("(2015 = 100)") || unitLower.includes("2015=100")) {
         return 'Index';
     }
     if (unitLower.includes("percentage of") || unitLower.includes("(percentage") || unitLower.endsWith('%')) {
         return 'Percentage';
     }
-    if (unitLower.includes("share")) { // Specific keyword for Share
+    if (unitLower.includes("share")) {
         return 'Share';
     }
-    if (unitLower.includes("rate") && !unitLower.includes("exchange rates")) { // "Rate" often implies percentage or ratio, unless it's an exchange rate (currency)
-        return 'Percentage'; // Or 'Ratio' depending on context, for now grouping with Percentage
+    if (unitLower.includes("rate") && !unitLower.includes("exchange rates")) {
+        return 'Percentage';
     }
     if (unitLower.includes("mrd ecu/eur") || unitLower.includes("1000 ecu/eur") || unitLower.includes("mrd eur")) {
-        return 'Currency'; // Could also be 'EUR' as a sub-category if needed
+        return 'Currency';
     }
-    if (unitLower.includes("national currency") && !unitLower.includes("2015 = 100")) { // Avoid capturing "National currency: 2015 = 100" as currency here
+    if (unitLower.includes("national currency") && !unitLower.includes("2015 = 100")) {
         return 'Currency';
     }
     if (unitLower.includes("pps")) {
@@ -64,19 +64,17 @@ export const getUnitCategory = (readableUnit: string): UnitCategory => {
         return 'Ratio';
     }
     if (unitLower.includes("capital productivity") || unitLower.includes("total factor productivity") || unitLower.includes("marginal efficiency")) {
-        // These might be indices or ratios. Let's tentatively group them.
-        // Or they could be specific enough to warrant their own category if they need a unique axis.
-        return 'Productivity'; // Or 'Index' or 'Ratio' depending on how you want to group
+        return 'Productivity';
     }
 
     // Broader fallback checks
     if (unitLower.includes("persons") || unitLower.includes("capita") || unitLower.includes("population") || unitLower.includes("employment") || unitLower.includes("employee")) {
         return 'Count';
     }
-    if (unitLower.includes("eur") || unitLower.includes("ecu")) { // General EUR/ECU if not caught by Mrd/1000
+    if (unitLower.includes("eur") || unitLower.includes("ecu")) {
         return 'Currency';
     }
-    if (unitLower.includes("ratio")) { // General ratio
+    if (unitLower.includes("ratio")) {
         return 'Ratio';
     }
 
