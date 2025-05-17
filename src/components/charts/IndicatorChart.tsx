@@ -9,7 +9,7 @@ import { ChartDotToggle } from '../controls/ChartDotToggle';
 import { DownloadSVGButton } from '../controls/DownloadSVGButton';
 
 import { useChartSeriesStore } from "../../store/chartSeriesStore";
-import { useChartUISettingsStore} from "../../store/chartUISettingsStore"; 
+import { useChartUISettingsStore} from "../../store/chartUISettingsStore";
 
 export const IndicatorChart: React.FC = () => {
     const { allData: fetchedIndicatorsData, isLoading, isFetching, isError, errors } = useFetchSelectedIndicators();
@@ -43,7 +43,7 @@ export const IndicatorChart: React.FC = () => {
                 isCalculated: true,
                 readableUnit: readableUnit,
                 category: getUnitCategory(readableUnit),
-                uiDisplayName: `${calc.variableName} (${readableUnit}) [Calc]`,
+                uiDisplayName: customSeriesNames[calc.variableCode] || `${calc.variableName} (${readableUnit}) [Calc]`,
             };
         });
         return [...fetchedAsPlottable, ...calculatedAsPlottable];
@@ -65,7 +65,7 @@ export const IndicatorChart: React.FC = () => {
         if (rechartsPlotRef.current) {
             const svgString = rechartsPlotRef.current.getSVGString();
             if (svgString) {
-                const blob = new Blob([svgString], { type: 'image/svg+xml' });
+                const blob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
@@ -80,7 +80,6 @@ export const IndicatorChart: React.FC = () => {
         }
     };
 
-    // ----- Loading/Error States -----
     if (isLoading && !isFetching && allAvailableSeriesForSelection.length === 0 ) {
         return <div className="p-4 text-center text-gray-500 dark:text-gray-400">Loading chart data...</div>;
     }
@@ -102,7 +101,6 @@ export const IndicatorChart: React.FC = () => {
                         allAvailableSeries={allAvailableSeriesForSelection}
                     />
                 )}
-                {/* Placeholder for alignment if ChartSeriesSelector is not shown */}
                 {allAvailableSeriesForSelection.length === 0 && <div />}
 
                 <div className="flex items-center space-x-2">
@@ -111,16 +109,16 @@ export const IndicatorChart: React.FC = () => {
                 </div>
             </div>
 
-
             {isFetching && (<div className="p-1 text-xs text-center text-sky-600 dark:text-sky-400 shrink-0">Updating chart...</div>)}
 
-            <div className="flex-grow min-h-0"> {/* This div is crucial for ResponsiveContainer to work */}
+            <div className="flex-grow min-h-0">
                 {indicatorsToPlot.length > 0 && pivotedChartData.length > 0 && yAxisConfig && yAxisConfig.length > 0 ? (
                     <RechartsPlot
-                        ref={rechartsPlotRef} // Assign the ref here
+                        ref={rechartsPlotRef}
                         pivotedData={pivotedChartData}
                         yAxisConfig={yAxisConfig}
                         seriesInfoForLines={unitInfoForPlotting}
+                        customSeriesNames={customSeriesNames}
                     />
                 ) : (
                     <div className="flex items-center justify-center h-full text-gray-500 dark:text-gray-400">
