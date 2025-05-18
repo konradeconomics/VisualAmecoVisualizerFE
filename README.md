@@ -4,6 +4,13 @@
 
 VisualAmeco is a web application designed for visualizing and interacting with macroeconomic data sourced from the AMECO database via a backend API. The frontend allows users to dynamically select various data dimensions, view data in charts, perform custom calculations between data series, and customize the appearance of these visualizations.
 
+## Screenshots
+
+![AmecoSelection](https://github.com/user-attachments/assets/0046ae5b-1130-4d34-95f6-535cd124b653)
+
+![AmecoPlot](https://github.com/user-attachments/assets/ca342ced-d594-4685-81a3-ed43e50d910d)
+
+
 ## Key Features
 
 * **Dynamic Data Selection:**
