@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { useFetchChapters } from '../../hooks/useFetchChapters'; // Adjust path
+import { useFetchChapters } from '../../hooks/useFetchChapters';
 import { useFilterSelectionsStore} from "../../store/filterSelectionStore.ts";
 
 import type { ChapterDto } from '../../types/dto/chapter.dto';

@@ -42,9 +42,6 @@ export const EditableAxisLabel: React.FC<EditableAxisLabelProps> = (props) => {
     const effectiveDefaultLabel = payload?.value || defaultLabel;
     const [editText, setEditText] = useState(customLabel || effectiveDefaultLabel);
 
-    console.log(`EditableAxisLabel (${yAxisId}): isEditing = ${isEditing}, editText = ${editText}`); // Log current state
-
-
     useEffect(() => {
         setEditText(customLabel || effectiveDefaultLabel);
     }, [customLabel, effectiveDefaultLabel]);

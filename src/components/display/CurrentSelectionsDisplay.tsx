@@ -1,6 +1,6 @@
 import React from 'react';
 import { useFilterSelectionsStore } from "../../store/filterSelectionStore.ts";
-import type { SelectedVariable } from '../../store/storeUtils'; // Or wherever SelectedVariable is defined
+import type { SelectedVariable } from '../../store/storeUtils';
 
 const SelectionTag: React.FC<{
     label: string;
